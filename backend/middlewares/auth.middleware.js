@@ -21,8 +21,6 @@ module.exports.authUser=async(req,res,next)=>{
     try{
         const decoded=jwt.verify(token,process.env.JWT_SECRET);
         
-        return res.status(401).json({message:'Unauthorized'})
-
         //decoded me vahi data ayega jo encrypt karna vkt ayega means id
         const user=await userModel.findById(decoded._id);
         req.user=user;

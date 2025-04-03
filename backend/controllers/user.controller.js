@@ -91,8 +91,15 @@ module.exports.getUserProfile=async(req,res,next)=>{
 //we will putn it in blacklist so no one can access
 module.exports.logoutUser=async(req,res,next)=>{
     try{
-    res.clearCookie('token');
-
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: false,  // ✅ Localhost pe false rakh
+            sameSite: "Lax",
+             
+        });
+        res.set("Cache-Control", "no-store");  // ✅ Cache disable
+       
+    
        ///req.cookies holds the cookies sent by the client.
      // ?. (optional chaining) ensures that if req.cookies is undefined (meaning cookies are not set up or used), it won’t throw an error.
     // If req.cookies.token exists, it is assigned to token.

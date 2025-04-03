@@ -57,7 +57,11 @@ module.exports.loginCaptain = async (req, res, next) => {
     }
 
     const token=captain.generateAuthToken();
-    res.cookie('token', token);
+    res.cookie('token', token, {
+        httpOnly: true,  // Prevents client-side JS from accessing the cookie
+        secure: false,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
+        sameSite: 'Lax', // Required for cross-site requests
+        });
     res.status(200).json({token,captain});
 }
 
@@ -75,8 +79,16 @@ module.exports.getCaptainProfile = async (req, res, next) => {
 
 module.exports.logoutCaptain = async (req, res, next) => {  
     const token=req.cookies.token|| (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+    if (!token) {
+        return res.status(400).json({ message: 'No token provided' });
+    }
     await blackListTokenModel.create({token});
-    res.clearCookie('token');
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,  // ✅ Localhost pe false rakh
+        sameSite: "Lax",
+    });
+    res.set("Cache-Control", "no-store");  // ✅ Cache disable
     res.status(200).json({message:'Logout successfully'});
 }
 

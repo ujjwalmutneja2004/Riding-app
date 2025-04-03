@@ -6,6 +6,7 @@ const cors=require('cors');
 const cookieParser=require('cookie-parser')
 const userRoutes=require('./routes/user.routes')
 const captainRoutes=require('./routes/captain.routes')
+const mapsRoutes=require('./routes/maps.routes')
 
 const app=express();
 //const port=process.env.PORT || 3000;
@@ -35,6 +36,7 @@ app.use('/users',userRoutes)
 
 console.log("entering register captain")
 app.use('/captains',captainRoutes)
+app.use('/maps',mapsRoutes)
 
 
 module.exports=app;
