@@ -31,13 +31,13 @@ const Riding = () => {
             <div className='60vh'>
             {/* console.log({ride?.destLat})
             console.log({ride?.destLng}) */}
-                <img className='h-full w-full object-fit' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
-                {/* <LiveTracking destination={{ lat: ride?.destLat, lng: ride?.destLng }} /> */}
+{/*                 <img className='h-full w-full object-fit' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" /> */}
+                 <LiveTracking destination={{ lat: ride?.destLat, lng: ride?.destLng }} /> 
             </div>
 
             <div className='h-1/2 p-4'>
                 <div className='flex items-center justify-between'>
-                    <img className='h-12' src={vehicleImages[ride?.captain?.vehicleType]} alt="" />
+                    <img className='h-12' src={vehicleImages[ride?.captain?.vehicle?.vehicleType]} alt="" />
                     <div className='text-right'>
                         <h2 className='text-lg font-medium capitalize'>{ride?.captain.fullname.firstname} </h2>
                         <h4 className='text-xl font-semibold -mt-1 -mb-1'>{ride?.captain.vehicle.plate}</h4>
