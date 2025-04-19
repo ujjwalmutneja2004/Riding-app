@@ -1,41 +1,9 @@
-// import React from 'react'
-// import { Link } from 'react-router-dom'
-// import CaptainDetails from '../components/CaptainDetails'
-
-// const CaptainHome = () => {
-//   return (
-//     <div className='h-screen'>
-//       <div className='fixed p-6 top-0 flex items-center justify-between w-screen '>
-//         <img className="w-16" src="https://pngimg.com/d/uber_PNG24.png" alt="" />
-
-
-//         <Link to='/captain-login' className=' h-8 w-10 bg-white flex itmes-center justify-center rounded-full'>
-//           <i className=" text-lg font-medium ri-logout-box-line"></i>
-//         </Link>
-
-
-//       </div>
-
-
-//       <div className='h-3/5'>
-//         <img className='h-full w-full object-fit' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
-//       </div>
-
-//       <div className='h-2/5 p-6'>
-//        <CaptainDetails />
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default CaptainHome
-
 
 import React from 'react';
 import { useState, useRef,useEffect,useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CaptainDetails from '../components/CaptainDetails';
-import RidePopUp from '../components/Ridepopup';
+import RidePopUp from '../components/RidePopup';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import ConfirmRidePopUp from '../components/ConfirmRideUp';
