@@ -136,7 +136,7 @@ const [fare,setFare]=useState({})
     console.log("Logout button clicked");
     try {
      // https://29dv0wmq-5173.inc1.devtunnels.ms/users/logoutu
-      const response = await fetch('http://localhost:4000/users/logoutu', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/users/logoutu`, {
         method: "GET",
         credentials: "include",
       });
@@ -157,7 +157,7 @@ const fetchSuggestions = async (input) => {
   try {
     const token = localStorage.getItem("token"); // Assuming user token is stored
     const res = await fetch(
-      `http://localhost:4000/maps/get-suggestions?input=${encodeURIComponent(input)}`,
+      `${import.meta.env.VITE_BASE_URL}/maps/get-suggestions?input=${encodeURIComponent(input)}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
