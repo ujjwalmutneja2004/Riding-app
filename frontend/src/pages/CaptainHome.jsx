@@ -46,8 +46,8 @@ const CaptainHome = () => {
             const accuracy = position.coords.accuracy;
             
             console.log("✅ Location fetched:", {
-              lat
-              lng
+              lat,
+              lng,
               accuracy
             });
 
