@@ -74,7 +74,7 @@ module.exports.loginUser=async(req,res,next)=>{
     res.cookie('token', token, {
         httpOnly: true,  // Prevents client-side JS from accessing the cookie
         secure: false,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
-        sameSite: 'Lax', // Required for cross-site requests
+        sameSite: 'None', // Required for cross-site requests
         });
     //token bhej denga user ko
     res.status(200) .json({token,user})
