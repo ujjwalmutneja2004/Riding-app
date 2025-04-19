@@ -3,7 +3,7 @@ import Userlogin from "./pages/Userlogin";
 import  UserSignup from "./pages/UserSignup";
 import CaptainLogin from "./pages/CaptainLogin";
 import CaptainSignup from "./pages/CaptainSignup";
-import Start from "./pages/start";
+import Start from "./pages/Start";
 import Homee from "./pages/Homee";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
