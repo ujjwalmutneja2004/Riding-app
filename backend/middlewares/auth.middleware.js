@@ -56,7 +56,7 @@ module.exports.authCaptain=async(req,res,next)=>{
         return next();
     }
     catch(err){
-        consolelog(err)
+        console.log(err)
         return res.status(401).json({message:'Unauthorized pakka'})
     }
 

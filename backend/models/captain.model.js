@@ -55,10 +55,14 @@ const captainSchema=new mongoose.Schema({
                 enum:['car','mororcycle','auto'],
                 required:true,
             },
+
+        },
+        
         location:{
             lat:{
                 type:Number,
             },
+           
             lng:{
                 type:Number,
             }
@@ -67,7 +71,7 @@ const captainSchema=new mongoose.Schema({
       
 
     }
-})
+)
 
 ///////////methods are used when you want to call on whole model  
 captainSchema.methods.generateAuthToken=function(){

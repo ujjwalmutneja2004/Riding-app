@@ -119,20 +119,16 @@ Authenticate an existing user and receive an authentication token.
 }
 ```
 #### Validation Error
-**Status Code:** 400 (Bad Request)# User API Documentation
+**Status Code:** 400 (Bad Request)
 
-
-
-
-Get User Profile
+## Get User Profile
 Retrieve the profile information of the authenticated user.
 
-Endpoint: GET /users/profile
+**Endpoint:** `GET /users/profile`
 
-
-Success Response
-Status Code: 200 (OK)
-
+### Success Response
+**Status Code:** 200 (OK)
+```json
 {
   "fullname": {
     "firstname": "John",
@@ -140,18 +136,19 @@ Status Code: 200 (OK)
   },
   "email": "john.doe@example.com"
 }
+```
 
-Error Responses
-Unauthorized
-Status Code: 401 (Unauthorized)
+### Error Responses
 
+#### Unauthorized
+**Status Code:** 401 (Unauthorized)
+```json
 {
   "message": "Unauthorized"
 }
+```
 
-
-
-ogout User
+## Logout User
 Logout the authenticated user and invalidate the authentication token.
 
 Endpoint: GET /users/logout
@@ -181,3 +178,25 @@ Status Code: 500 (Internal Server Error)
 {
   "message": "Something went wrong"
 }
+
+
+# Get Fare
+
+Calculate the estimated fare for a ride based on the pickup and destination locations.
+
+**Endpoint:** `GET /rides/get-fare`
+
+### Query Parameters
+- `pickup` (string, required): The pickup location address. Must be at least 3 characters long.
+- `destination` (string, required): The destination location address. Must be at least 3 characters long.
+
+### Validation Rules
+- `pickup`: Must be a valid string with a minimum length of 3 characters.
+- `destination`: Must be a valid string with a minimum length of 3 characters.
+
+### Example Request
+```http
+GET /rides/get-fare?pickup=123+Main+Street&destination=456+Elm+Street HTTP/1.1
+Host: localhost:4000
+Authorization: Bearer <JWT_TOKEN>
+```

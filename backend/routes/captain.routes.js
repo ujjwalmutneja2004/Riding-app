@@ -18,6 +18,7 @@ router.post('/register',[
 )
 
 
+//Ye express-validator ka middleware hai jo route ke aane se pehle input validation karta hai.
 router.post('/login',[
     body('email').isEmail().withMessage('Please enter a valid email address'),
     body('password').isString().isLength({min:5}).withMessage('Password must be at least 5 characters long')

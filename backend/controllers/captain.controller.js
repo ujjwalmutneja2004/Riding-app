@@ -4,6 +4,9 @@ const captainService = require('../services/captain.service');
 const { validationResult } = require('express-validator');
 const blackListTokenModel=require('../models/blacklist.Token.model')
 
+
+///const { validationResult } = require('express-validator'); is used to extract validation results from a request when you're using express-validator in an Express.js app.
+
 module.exports.registerCaptain = async (req, res, next) => {
     console.log("register captain");
     const errors = validationResult(req);

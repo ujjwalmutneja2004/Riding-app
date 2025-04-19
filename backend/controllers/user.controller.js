@@ -93,8 +93,8 @@ module.exports.logoutUser=async(req,res,next)=>{
     try{
         res.clearCookie("token", {
             httpOnly: true,
-            secure: false,  // ✅ Localhost pe false rakh
-            sameSite: "Lax",
+            secure: process.env.NODE_ENV === 'production',  // Set to true for production environments
+            sameSite: "None",
              
         });
         res.set("Cache-Control", "no-store");  // ✅ Cache disable
