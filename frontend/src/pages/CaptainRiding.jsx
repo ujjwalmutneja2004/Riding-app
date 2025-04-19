@@ -424,43 +424,69 @@ const CaptainRiding = () => {
   const location = useLocation();
   const ride = location.state?.ride;
   const navigate = useNavigate();
-
-  const [captainLocation, setCaptainLocation] = useState(null);
+const [captainLocation, setCaptainLocation] = useState(null);
   const [distance, setDistance] = useState(null);
 
-  // Fetch location every 10 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude, accuracy } = position.coords;
-          const current = {
-            lat: latitude,
-            lng: longitude,
-            accuracy: `${accuracy} meters`,
-          };
-          console.log("\nLocation fetched:", JSON.stringify(current, null, 2));
-          setCaptainLocation({ lat: latitude, lng: longitude });
-        },
-        (err) => {
-          console.error("❌ Error fetching location:", err);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0,
-        }
-      );
-    }, 10000);
+    //added
+  const { socket } = useContext(SocketContext);
 
-    return () => clearInterval(interval);
-  }, []);
+  useEffect(() => {
+    socket.on("update-location-captain", (data) => {
+      console.log("📍 Location update received:", data);
+      setCaptainLocation(data.location);
+    });
+
+    return () => {
+      socket.off("update-location-captain");
+    };
+  }, [socket]);
+
+    //added
+    
+
+
+//added
+  // Fetch location every 10 seconds
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         const { latitude, longitude, accuracy } = position.coords;
+  //         const current = {
+  //           lat: latitude,
+  //           lng: longitude,
+  //           accuracy: `${accuracy} meters`,
+  //         };
+  //         console.log("\nLocation fetched:", JSON.stringify(current, null, 2));
+  //         setCaptainLocation({ lat: latitude, lng: longitude });
+  //       },
+  //       (err) => {
+  //         console.error("❌ Error fetching location:", err);
+  //       },
+  //       {
+  //         enableHighAccuracy: true,
+  //         timeout: 10000,
+  //         maximumAge: 0,
+  //       }
+  //     );
+  //   }, 10000);
+
+  //   return () => clearInterval(interval);
+  // }, []);
+
+
+    //added
+  useEffect(() => {
+    if (!ride) navigate("/"); // or any default route
+  }, [ride]);
+    //added
 
   const calculateDistance = async () => {
     if (!captainLocation || !ride?.destLat || !ride?.destLng) {
       alert("Missing location or destination coordinates");
       return;
     }
+      
 
     try {
       const token = localStorage.getItem("token");
