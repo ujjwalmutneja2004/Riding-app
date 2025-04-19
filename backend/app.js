@@ -21,6 +21,7 @@ app.use(cors({
 origin: [
   "http://localhost:5173",
   "https://29dv0wmq-5173.inc1.devtunnels.ms"
+  "https://riding-app-vwiu.vercel.app/"
 ], // Explicit frontend URL
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization",
