@@ -17,7 +17,7 @@ const CaptainHome = () => {
   
   const[ ridePopupPanel , setRidePopupPanel ] = useState(false);
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
-
+   const [captainLocation, setCaptainLocation] = useState(null);
 
   const ridePopupPanelRef = useRef(null);
   const confirmRidePopupPanelRef = useRef(null)
@@ -36,15 +36,22 @@ const CaptainHome = () => {
   
     const updateLocation = () => {
       if (navigator.geolocation) {
+        
         console.log("📍 Trying to get current location...");
         
         navigator.geolocation.getCurrentPosition(
           (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+            
             console.log("✅ Location fetched:", {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-              accuracy: position.coords.accuracy + " meters"
+              lat
+              lng
+              accuracy
             });
+
+             setCaptainLocation({ lat, lng });
     
             socket.emit('update-location-captain', {
               userId: captain._id,
