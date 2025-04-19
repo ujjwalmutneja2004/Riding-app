@@ -63,7 +63,7 @@ module.exports.loginCaptain = async (req, res, next) => {
     res.cookie('token', token, {
         httpOnly: true,  // Prevents client-side JS from accessing the cookie
         secure: false,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
-        sameSite: 'Lax', // Required for cross-site requests
+        sameSite: 'None', // Required for cross-site requests
         });
     res.status(200).json({token,captain});
 }
@@ -89,7 +89,7 @@ module.exports.logoutCaptain = async (req, res, next) => {
     res.clearCookie("token", {
         httpOnly: true,
         secure: true,            // ✅ Must be true on HTTPS (Render uses HTTPS)
-       sameSite: 'None     
+         sameSite: 'None'    
     });
     res.set("Cache-Control", "no-store");  // ✅ Cache disable
     res.status(200).json({message:'Logout successfully'});
