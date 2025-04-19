@@ -349,7 +349,7 @@ const CaptainRiding = () => {
 
      {areCoordsValid && <div className="h-4/5">
 
-      {/* <CaptainLiveTracking
+      <CaptainLiveTracking
     destination={{
         lat: parseFloat(ride?.destLat),
         lng: parseFloat(ride?.destLng),
@@ -358,8 +358,8 @@ const CaptainRiding = () => {
         lat: parseFloat(ride?.pickupLat),
         lng: parseFloat(ride?.pickupLng),
     }}
-/> */}
-   <img className='h-full w-full object-fit' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
+/>
+{/*    <img className='h-full w-full object-fit' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" /> */}
 
 
          {/* <img
