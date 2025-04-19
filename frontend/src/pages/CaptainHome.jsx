@@ -3,7 +3,7 @@ import React from 'react';
 import { useState, useRef,useEffect,useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CaptainDetails from '../components/CaptainDetails';
-import RidePopUp from '../components/RidePopup';
+import RidePopUp from '../components/RidePopUp';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import ConfirmRidePopUp from '../components/ConfirmRideUp';
