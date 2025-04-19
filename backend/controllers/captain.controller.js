@@ -88,8 +88,8 @@ module.exports.logoutCaptain = async (req, res, next) => {
     await blackListTokenModel.create({token});
     res.clearCookie("token", {
         httpOnly: true,
-        secure: false,  // ✅ Localhost pe false rakh
-        sameSite: "Lax",
+        secure: true,            // ✅ Must be true on HTTPS (Render uses HTTPS)
+       sameSite: 'None     
     });
     res.set("Cache-Control", "no-store");  // ✅ Cache disable
     res.status(200).json({message:'Logout successfully'});
