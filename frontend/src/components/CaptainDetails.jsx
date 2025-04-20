@@ -1,12 +1,48 @@
-import React ,{useContext} from 'react'
+import React ,{useContext, useEffect, useState} from 'react'
 import { CaptainDataContext } from '../context/CaptainContext';
+import axios from 'axios';
 
 
 
 const CaptainDetails = () => {
+  const [earnings, setEarningsData] = useState(null);
 
   const { captain } = useContext(CaptainDataContext);
+  if (!captain) {
+    return <div>Loading captain details...</div>; 
+  }
   console.log("captainb"+captain)
+
+
+  useEffect(() => {
+    // API call
+    const fetchEarnings = async () => {
+      try {
+         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/${captain?._id}/earnings`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+    
+        setEarningsData(response.data);
+      } catch (error) {
+        console.error("Error fetching earnings data:", error);
+      }
+    };
+
+    if (captain?._id) {
+      fetchEarnings();
+    }
+
+  }, [captain]);
+
+  if (!earnings) {
+    return <div>Loading earnings data...</div>;
+  }
+
+
+
+
   return (
     <div>
    <div className='flex items-center justify-between'>
@@ -16,7 +52,7 @@ const CaptainDetails = () => {
              </div>
 
             <div>
-               <h4 className='text-xl font-semibold'>$295.5</h4>
+               <h4 className='text-xl font-semibold'>{` ₹${earnings.totalFare}`}</h4>
                <p className='text-sm font text-gray-900'> Earned</p>
             </div>
           </div>
@@ -25,20 +61,20 @@ const CaptainDetails = () => {
 
               <div className='text-center'>
               <i className="text-2xl front-thin ri-time-line"></i>
-              <h5 className='text-lg font-medium'>10.2</h5>
-              <p className='text-sm text-gray-600'> Hours Online</p>
+              <h5 className='text-lg font-medium'>`{earnings.totaldistance}`</h5>
+              <p className='text-sm text-gray-600'> Distance </p>
               </div>
 
               <div className='text-center'>
               <i className="text-2xl front-thin ri-speed-up-line"></i>
-              <h5 className='text-lg font-medium'>10.2</h5>
+              <h5 className='text-lg font-medium'>`{earnings.totalduration}`</h5>
               <p className='text-sm text-gray-600'> Hours Online</p>
               </div>
 
               <div className='text-center'>
               <i className=" text-2xl front-thin ri-booklet-line"></i>
-              <h5 className='text-lg font-medium'>10.2</h5>
-              <p  className='text-sm text-gray-600'> Hours Online</p>
+              <h5 className='text-lg font-medium'>`{earnings.totalRides}`</h5>
+              <p  className='text-sm text-gray-600'> Total Rides</p>
               </div>
 
             </div>
