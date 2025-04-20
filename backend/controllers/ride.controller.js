@@ -4,6 +4,8 @@ const rideModel = require('../models/ride.model');
 const { route } = require('../routes/maps.routes');
 const {sendMessageToSocketId}=require('../socket')
 const mapServices=require('../services/maps.service')
+const { getCaptainEarningsService } = require('../services/ride.service');
+const mongoose = require('mongoose');
 
 module.exports.createRide = async (req, res) => {
     const errors = validationResult(req);
@@ -169,6 +171,18 @@ module.exports.endRide=async(req,res)=>{
 
 }
 
+
+module.exports.getCaptainEarnings = async (req, res) => {
+    const { captainId } = req.params;
+
+    try {
+        const earnings = await getCaptainEarningsService(captainId);
+        res.json(earnings);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 
 
 
