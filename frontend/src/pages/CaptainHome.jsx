@@ -10,6 +10,8 @@ import ConfirmRidePopUp from '../components/ConfirmRideUp';
 import { Link } from 'react-router-dom';
 import { SocketContext } from '../context/SocketContext'
 import { CaptainDataContext } from '../context/CaptainContext';
+
+
 import axios from 'axios';
 
 const CaptainHome = () => {
@@ -17,7 +19,8 @@ const CaptainHome = () => {
   
   const[ ridePopupPanel , setRidePopupPanel ] = useState(false);
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
-   const [captainLocation, setCaptainLocation] = useState(null);
+  const [captainLocation, setCaptainLocation] = useState(null);
+
 
   const ridePopupPanelRef = useRef(null);
   const confirmRidePopupPanelRef = useRef(null)
@@ -28,37 +31,98 @@ const CaptainHome = () => {
   console.log("captainaagya"+captain)
 
 
+  // useEffect(() => {
+  //   socket.emit('join', {
+  //     userId: captain._id,
+  //     userType: 'captain'
+  //   });
+  
+  //   const updateLocation = () => {
+  //     if (navigator.geolocation) {
+  //       console.log("📍 Trying to get current location...");
+        
+  //       navigator.geolocation.getCurrentPosition(
+  //         (position) => {
+  //           console.log("✅ Location fetched:", {
+  //             lat: position.coords.latitude,
+  //             lng: position.coords.longitude,
+  //             accuracy: position.coords.accuracy + " meters"
+  //           });
+
+
+  //             // Update captainLocation state with the new location
+  //             setCaptainLocation({
+  //               lat: position.coords.latitude,
+  //               lng: position.coords.longitude,
+  //           });
+    
+  //           socket.emit('update-location-captain', {
+  //             userId: captain._id,
+  //             location: {
+  //               lat: position.coords.latitude,
+  //               lng: position.coords.longitude
+  //             }
+  //           });
+  //         },
+  //         (error) => {
+  //           console.error("❌ Geolocation error:", error.message);
+  //         },
+  //         {
+  //           enableHighAccuracy: true,
+  //           timeout: 10000,       // Wait max 10 sec
+  //           maximumAge: 0         // Always fetch new location, no cache
+  //         }
+  //       );
+  //     } else {
+  //       console.error("🚫 Geolocation not supported by this browser.");
+  //     }
+  //   };
+    
+  //   // Call once immediately
+  //   updateLocation();
+    
+  //   // Repeat every 10 seconds
+  //   const locationInterval = setInterval(updateLocation, 10000);
+    
+  //   // Cleanup on unmount
+  //   return () => clearInterval(locationInterval)
+  // });
+
+
+
   useEffect(() => {
+    if (!captain?._id) return;
+  
+    // Join the socket room
     socket.emit('join', {
       userId: captain._id,
       userType: 'captain'
     });
   
+    // Location updater
     const updateLocation = () => {
       if (navigator.geolocation) {
-        
         console.log("📍 Trying to get current location...");
-        
+  
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
             const accuracy = position.coords.accuracy;
-            
+  
             console.log("✅ Location fetched:", {
               lat,
               lng,
-              accuracy
+              accuracy: `${accuracy} meters`
             });
-
-             setCaptainLocation({ lat, lng });
-    
+  
+            // Store in state to pass as prop elsewhere
+            setCaptainLocation({ lat, lng });
+  
+            // Emit to backend
             socket.emit('update-location-captain', {
               userId: captain._id,
-              location: {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              }
+              location: { lat, lng }
             });
           },
           (error) => {
@@ -66,24 +130,27 @@ const CaptainHome = () => {
           },
           {
             enableHighAccuracy: true,
-            timeout: 10000,       // Wait max 10 sec
-            maximumAge: 0         // Always fetch new location, no cache
+            timeout: 10000,
+            maximumAge: 0
           }
         );
       } else {
         console.error("🚫 Geolocation not supported by this browser.");
       }
     };
-    
-    // Call once immediately
+  
+    // Immediate call
     updateLocation();
-    
+  
     // Repeat every 10 seconds
     const locationInterval = setInterval(updateLocation, 10000);
-    
-    // Cleanup on unmount
-    return () => clearInterval(locationInterval)
-  });
+  
+    // Clean up
+    return () => clearInterval(locationInterval);
+  
+  }, [captain, socket]);
+  
+  
     
   
 //   ✅ What it does:
@@ -189,15 +256,6 @@ const CaptainHome = () => {
       console.error('Error logging out:', error);
     }
   };
-
-
-
-
-
-
-
-
-
   return (
     <div className="h-screen">
       <div className="fixed p-6 top-0 flex items-center justify-between w-screen">
@@ -240,6 +298,7 @@ const CaptainHome = () => {
         ride={ride}
           setConfirmRidePopupPanel={setConfirmRidePopupPanel}
           setRidePopupPanel={setRidePopupPanel}
+           captainLocation={captainLocation}
         />
       </div>
 
