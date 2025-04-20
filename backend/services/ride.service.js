@@ -3,6 +3,8 @@ const rideModel= require('../models/ride.model');
 const mapService=require('./maps.service');
 const crypto=require('crypto');
 const { sendMessageToSocketId } = require('../socket'); // ✅ Add this in ride.service.js
+const { sendMessageToSocketId } = require('../socket'); // ✅ Add this in ride.service.js
+const { getDistanceTimeByCoord } = require('./maps.service'); // ✅ Import the function
 
 
 
@@ -82,6 +84,14 @@ module.exports.createRide=async ({
     }
 
     const fare=await getFare(pickup,destination)
+       const distanceData = await getDistanceTimeByCoord(
+        { originLat: pickupLat, originLng: pickupLng },
+        { destLat: destLat, destLng: destLng }
+      );
+      
+      const routeSummary = distanceData.routes[0]?.summary;
+      const distance = (routeSummary.lengthInMeters / 1000).toFixed(2); // in km
+      const duration = (routeSummary.travelTimeInSeconds / 60).toFixed(2); // in minutes
 
 
     const ride=await rideModel.create({
@@ -93,7 +103,9 @@ module.exports.createRide=async ({
         pickupLat,
         pickupLng,
         destLat,
-        destLng
+        destLng,
+        distance,
+        duration
 
     });
 
@@ -211,4 +223,34 @@ module.exports.startRide=async ({rideId,otp,captain})=>{
             return ride;
 
     }
+
+module.exports.getCaptainEarningsService = async (captainId) => {
+        const completedRides = await rideModel.aggregate([
+            {
+                $match: {
+                    captain: new mongoose.Types.ObjectId(captainId),
+                    status: 'completed'
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalFare: { $sum: '$fare' },
+                    totaldistance: { $sum: '$distance' },
+                    totalduration: { $sum: '$duration' },
+                    totalRides: { $sum: 1 }
+                }
+            }
+        ]);
+    
+        const rawFare = completedRides[0]?.totalFare || 0;
+        const totalFare = Math.round(rawFare);
+    
+        return { 
+            totalFare,
+            totaldistance: completedRides[0]?.totaldistance || 0,
+            totalduration: completedRides[0]?.totalduration || 0,
+            totalRides: completedRides[0]?.totalRides || 0
+        };
+    };
    
