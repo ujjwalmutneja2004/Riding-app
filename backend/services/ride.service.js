@@ -3,7 +3,6 @@ const rideModel= require('../models/ride.model');
 const mapService=require('./maps.service');
 const crypto=require('crypto');
 const { sendMessageToSocketId } = require('../socket'); // ✅ Add this in ride.service.js
-const { sendMessageToSocketId } = require('../socket'); // ✅ Add this in ride.service.js
 const { getDistanceTimeByCoord } = require('./maps.service'); // ✅ Import the function
 
 
