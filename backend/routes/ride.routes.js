@@ -3,6 +3,8 @@ const router=express.Router();
 const {body,query}=require('express-validator');
 const rideController=require('../controllers/ride.controller')
 const authMiddleware=require('../middlewares/auth.middleware')
+const {getCaptainEarnings} = require('../controllers/ride.controller')
+
 
 router.post('/create',
    authMiddleware.authUser,
@@ -39,6 +41,8 @@ router.post('/end-ride',
     rideController.endRide
 
 )
+
+router.get('/:captainId/earnings',getCaptainEarnings);
 
 
 module.exports=router;
