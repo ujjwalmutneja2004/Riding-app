@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { CaptainDataContext } from '../context/CaptainContext';
 import axios from 'axios';
+import logo from '../assets/logoo.png';
 
 const CaptainLogin = () => {
   const [email, setEmail] = useState('');
@@ -47,7 +48,7 @@ const CaptainLogin = () => {
   return (
     <div className='p-7 h-screen flex flex-col justify-between'>
       <div>
-        <img className='w-20 mb-7' src="https://pngimg.com/d/uber_PNG24.png" alt="logo" />
+        <img className='w-40 h-20 object-contain mb-5'src={logo} alt="logo" />
         <form onSubmit={submitHandler}>
           <h3 className='text-lg font-medium mb-2'>What's your email</h3>
           <input
