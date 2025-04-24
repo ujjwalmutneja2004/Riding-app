@@ -14,6 +14,7 @@ import WaitingForDriver from "../components/WaitingForDriver";
 import { SocketContext } from "../context/SocketContext"
 import { useContext } from "react";
 import {UserDataContext} from "../context/UserContext"
+import logo from "../assets/logoo.png";
 
 const Homee = () => {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ const Homee = () => {
 
   const [pickupDebounced, setPickupDebounced] = useState("");
 const [destinationDebounced, setDestinationDebounced] = useState("");
+  
 // const [fare,setFare]=useState({})
 const [fare,setFare]=useState({})
  const {socket}=useContext(SocketContext)
@@ -205,11 +207,13 @@ async function createRide() {
 
   return (
     <div className="h-screen relative overflow-hidden">
-      <img
-        className="w-16 absolute left-5 top-5 mb-10"
-        src="https://upload.wikimedia.org/wikipedia/commons/5/58/Uber_logo_2018.svg"
-        alt="logo"
-      />
+    {!panelOpen && (
+     <img
+    className="w-24 h-30 h-auto absolute top-5 left-2 z-50"
+    src={logo}
+    alt="logo"
+     />
+    )}
       <button
         onClick={handleLogout}
         className="absolute right-5 top-5 bg-white h-10 w-10 flex items-center justify-center rounded-full shadow-md z-50"
