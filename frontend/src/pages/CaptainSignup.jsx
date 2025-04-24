@@ -6,6 +6,7 @@ import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify'; // ✅ Toast Import
 import 'react-toastify/dist/ReactToastify.css'; 
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // ✅ Eye Icon Import
+import logo from '../assets/logoo.png';
 
 const CaptainSignup = () => {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ const CaptainSignup = () => {
       <ToastContainer position="top-right" autoClose={3000} /> {/* ✅ Toast Container */}
       
       <div>
-        <img className="w-20 mb-3" src="https://pngimg.com/d/uber_PNG24.png" alt="Uber Logo" />
+         <img className="w-21 h-20 mb-2" src={logo} alt="Logo" />
 
         <form onSubmit={submitHandler} className="bg-white p-5 rounded-lg shadow-md">
           <h3 className="text-lg font-medium mb-2">What's our Captain's name</h3>
