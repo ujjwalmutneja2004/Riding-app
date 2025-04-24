@@ -4,6 +4,7 @@ import { useState,useffect ,useContext} from 'react'
 import { SocketContext } from '../context/SocketContext'
 import { useNavigate } from 'react-router-dom'
 import LiveTracking from '../components/LiveTracking'
+import logo from '../assets/logoo.png';
 
 const vehicleImages = {
     car: "https://www.pngplay.com/wp-content/uploads/8/Uber-PNG-Photos.png",
@@ -24,6 +25,12 @@ const Riding = () => {
 
     return (
         <div className='h-screen'>
+              <img
+              className="w-24 h-30 h-auto absolute top-5 left-2 z-50 "
+               src={logo}
+               alt="logo"
+                 />
+            
             <Link to='/home' className='fixed right-2 mt-4  h-8 w-10 bg-white flex itmes-center justify-center rounded-full'>
             <i className=" text-lg font-medium ri-home-8-fill"></i>
             </Link>
