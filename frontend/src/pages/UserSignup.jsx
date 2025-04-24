@@ -133,6 +133,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UserDataContext } from '../context/UserContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';  // Import eye icons
+import logo from '../assets/logoo.png';
 
 const UserSignup = () => {
     const [email, setEmail] = useState('');
@@ -196,8 +197,7 @@ const UserSignup = () => {
     return (
         <div className='p-5 h-screen flex flex-col justify-between'>
             <div>
-                <img className='w-16 mb-10' src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/2560px-Uber_logo_2018.svg.png" alt="logo" />
-                
+                <img className="w-21 h-20 mb-2" src={logo} alt="Logo" />
                 <form onSubmit={submitHandler}>
                     <h3 className='text w-1/2 font-medium mb-2'>What's your name</h3>
                     <div className='flex gap-4 mb-6'>
