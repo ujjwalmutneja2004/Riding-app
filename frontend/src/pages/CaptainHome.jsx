@@ -259,7 +259,7 @@ const CaptainHome = () => {
   return (
     <div className="h-screen">
       <div className="fixed p-6 top-0 flex items-center justify-between w-screen">
-        <img className="w-16" src="https://pngimg.com/d/uber_PNG24.png" alt="Logo" />
+          <img className="w-20 h-15" src={logo} alt="Logo" />
 
         <button
           onClick={handleLogout}
