@@ -10,7 +10,7 @@ import ConfirmRidePopUp from '../components/ConfirmRideUp';
 import { Link } from 'react-router-dom';
 import { SocketContext } from '../context/SocketContext'
 import { CaptainDataContext } from '../context/CaptainContext';
-
+import logo from '../assets/logoo.png';
 
 import axios from 'axios';
 
