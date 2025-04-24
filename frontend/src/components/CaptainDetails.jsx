@@ -52,7 +52,7 @@ const CaptainDetails = () => {
              </div>
 
             <div>
-               <h4 className='text-xl font-semibold'>{` ₹${earnings.totalFare}`}</h4>
+               <h4 className='text-xl font-semibold'>₹ {earnings.totalFare.toFixed(2)}</h4>
                <p className='text-sm font text-gray-900'> Earned</p>
             </div>
           </div>
@@ -61,19 +61,19 @@ const CaptainDetails = () => {
 
               <div className='text-center'>
               <i className="text-2xl front-thin ri-time-line"></i>
-              <h5 className='text-lg font-medium'>`{earnings.totaldistance}`</h5>
+              <h5 className='text-lg font-medium'>{Math.round(earnings.totaldistance)}</h5>
               <p className='text-sm text-gray-600'> Distance </p>
               </div>
 
               <div className='text-center'>
               <i className="text-2xl front-thin ri-speed-up-line"></i>
-              <h5 className='text-lg font-medium'>`{earnings.totalduration}`</h5>
+              <h5 className='text-lg font-medium'>{Math.round(earnings.totalduration)}</h5>
               <p className='text-sm text-gray-600'> Hours Online</p>
               </div>
 
               <div className='text-center'>
               <i className=" text-2xl front-thin ri-booklet-line"></i>
-              <h5 className='text-lg font-medium'>`{earnings.totalRides}`</h5>
+              <h5 className='text-lg font-medium'>{earnings.totalRides}</h5>
               <p  className='text-sm text-gray-600'> Total Rides</p>
               </div>
 
