@@ -201,6 +201,7 @@ import gsap from "gsap";
 import axios from "axios";
 import { SocketContext } from "../context/SocketContext";
 import { LocationContext } from "../context/LocationContext";
+import logo from '../assets/logoo.png'
 
 const CaptainRiding = () => {
   const [finishRidePanel, setFinishRidePanel] = useState(false);
@@ -334,10 +335,10 @@ const CaptainRiding = () => {
   return (
     <div className=" flex flex-col h-screen">
      <div className="fixed p-4 top-0 left-0 right-0 bg-white z-10 flex items-center justify-between">
-        <img
-          className="w-16"
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/2560px-Uber_logo_2018.svg.png"
-          alt="Uber Logo"
+       <img
+          className="w-20 h-auto"
+          src={logo}
+          alt="Logo"
         />
         <button
           onClick={handleLogout}
