@@ -12,7 +12,7 @@ function initializeSocket(server) {
       origin:[
         "https://29dv0wmq-5173.inc1.devtunnels.ms",
         "http://localhost:5173", // Replace with your frontend URL
-        "https://riding-app-vwiu.vercel.app"
+        "travelx-five.vercel.app"
       ],
       methods: ["GET", "POST"],
       credentials: true   
