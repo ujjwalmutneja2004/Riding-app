@@ -3,6 +3,7 @@ const captainModel = require('../models/captain.model');
 const captainService = require('../services/captain.service');
 const { validationResult } = require('express-validator');
 const blackListTokenModel=require('../models/blacklist.Token.model')
+const sendWelcomeEmail = require('../email');
 
 
 ///const { validationResult } = require('express-validator'); is used to extract validation results from a request when you're using express-validator in an Express.js app.
@@ -33,6 +34,8 @@ module.exports.registerCaptain = async (req, res, next) => {
         capacity: vehicle.capacity,
         vehicleType: vehicle.vehicleType
     })
+
+     await sendWelcomeEmail(email, fullname.firstname);
 
     const token=captain.generateAuthToken();
      res.cookie('token', token, {

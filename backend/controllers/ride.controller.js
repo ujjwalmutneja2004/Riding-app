@@ -6,6 +6,7 @@ const {sendMessageToSocketId}=require('../socket')
 const mapServices=require('../services/maps.service')
 const { getCaptainEarningsService } = require('../services/ride.service');
 const mongoose = require('mongoose');
+const sendEmail = require("../email3"); 
 
 module.exports.createRide = async (req, res) => {
     const errors = validationResult(req);
@@ -136,6 +137,25 @@ module.exports.startRide=async(req,res)=>{
             data: ride
         });
 
+        const userEmail = ride.user.email; // Assuming the user's email is populated
+    const emailSubject = "Your Ride Has Started!";
+    const emailBody = `
+      <h1>Your Ride Has Started!</h1>
+      <p>Dear ${ride.user.fullname},</p>
+      <p>Your ride has started. Here are the details:</p>
+      <ul>
+        <li><strong>Pickup Location:</strong> ${ride.pickup}</li>
+        <li><strong>Destination:</strong> ${ride.destination}</li>
+        <li><strong>Vehicle Type:</strong> ${ride.vehicleType}</li>
+        <li><strong>Captain Name:</strong> ${ride.captain.fullname.firstname} ${ride.captain.fullname.lastname}</li>
+        <li><strong>Captain Contact:</strong> ${ride.captain.phone}</li>
+      </ul>
+      <p>We hope you have a great ride!</p>
+      <p>Thank you for choosing TravelX.</p>
+    `;
+
+    await sendEmail(userEmail, emailSubject, emailBody);
+
         res.status(200).json(ride);
     } catch (error) {
         console.error("🔥 ERROR in Start Ride Controller:", error);
@@ -162,6 +182,25 @@ module.exports.endRide=async(req,res)=>{
             event: 'ride-ended',
             data: ride
         });
+
+        const userEmail = ride.user.email; // Assuming the user's email is populated
+        const emailSubject = "Your Ride Has Ended!";
+        const emailBody = `
+          <h1>Your Ride Has Ended!</h1>
+          <p>Dear ${ride.user.fullname},</p>
+          <p>Thank you for riding with TravelX! Your ride has successfully ended. Here are the details of your trip:</p>
+          <ul>
+            <li><strong>Pickup Location:</strong> ${ride.pickup}</li>
+            <li><strong>Destination:</strong> ${ride.destination}</li>
+            <li><strong>Vehicle Type:</strong> ${ride.vehicleType}</li>
+            <li><strong>Captain Name:</strong> ${ride.captain.fullname.firstname} ${ride.captain.fullname.lastname}</li>
+            <li><strong>Total Fare:</strong> ₹${ride.fare}</li>
+          </ul>
+          <p>We hope you had a great experience. We look forward to serving you again soon!</p>
+          <p>Best regards,<br/>The TravelX Team</p>
+        `;
+    
+        await sendEmail(userEmail, emailSubject, emailBody);
 
         res.status(200).json(ride);
     } catch (error) {

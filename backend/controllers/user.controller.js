@@ -4,7 +4,7 @@ const userModel=require('../models/user.model');
 const userService=require("../services/user.services");
 const { validationResult }=require('express-validator')
 const blackListTokenModel=require('../models/blacklist.Token.model')
-
+const sendUserWelcomeEmail = require('../email2');
 
 
 
@@ -32,7 +32,7 @@ module.exports.registerUser=async(req,res,next)=>{
         password:hashedPassword
     })
 
-
+    await sendUserWelcomeEmail(email, fullname.firstname);
     const token=user.generateAuthToken();
     res.cookie('token', token, {
      httpOnly: true,
