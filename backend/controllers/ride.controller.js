@@ -141,14 +141,13 @@ module.exports.startRide=async(req,res)=>{
     const emailSubject = "Your Ride Has Started!";
     const emailBody = `
       <h1>Your Ride Has Started!</h1>
-      <p>Dear ${ride.user.fullname},</p>
+      <p>Dear ${ride.user.fullname.firstname} ${ride.user.fullname.lastname},</p>
       <p>Your ride has started. Here are the details:</p>
       <ul>
         <li><strong>Pickup Location:</strong> ${ride.pickup}</li>
         <li><strong>Destination:</strong> ${ride.destination}</li>
-        <li><strong>Vehicle Type:</strong> ${ride.vehicleType}</li>
-        <li><strong>Captain Name:</strong> ${ride.captain.fullname.firstname} ${ride.captain.fullname.lastname}</li>
-        <li><strong>Captain Contact:</strong> ${ride.captain.phone}</li>
+        <li><strong>Vehicle Type:</strong> ${ride.captain.vehicleType}</li>
+        <li><strong>Captain Name:</strong> ${ride.captain.fullname.firstname}</li>
       </ul>
       <p>We hope you have a great ride!</p>
       <p>Thank you for choosing TravelX.</p>
@@ -187,7 +186,7 @@ module.exports.endRide=async(req,res)=>{
         const emailSubject = "Your Ride Has Ended!";
         const emailBody = `
           <h1>Your Ride Has Ended!</h1>
-          <p>Dear ${ride.user.fullname},</p>
+          <p>Dear ${ride.user.fullname.firstname} ${ride.user.fullname.lastname} ,</p>
           <p>Thank you for riding with TravelX! Your ride has successfully ended. Here are the details of your trip:</p>
           <ul>
             <li><strong>Pickup Location:</strong> ${ride.pickup}</li>
