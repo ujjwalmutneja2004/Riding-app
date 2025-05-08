@@ -24,7 +24,7 @@ app.use(cors({
 origin: [
   "http://localhost:5173",
   // "https://29dv0wmq-5173.inc1.devtunnels.ms",
-  // "https://travelx-five.vercel.app"
+  "https://travelx-five.vercel.app"
 ], // Explicit frontend URL
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization",
@@ -136,7 +136,7 @@ app.get(
         
       console.log('Cookie set successfully');
       // Redirect to the frontend home page
-      res.redirect('http://localhost:5173/home');
+      res.redirect('https://travelx-five.vercel.app/home');
     } catch (error) {
       console.error('Error in Google OAuth callback:', error);
       res.redirect('/login');
