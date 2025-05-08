@@ -140,7 +140,7 @@ const [fare,setFare]=useState({})
      // https://29dv0wmq-5173.inc1.devtunnels.ms/users/logoutu
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/users/logoutu`, {
         method: "GET",
-        credentials: "include",
+        credentials:"include",
       });
 
       if (response.ok) {
@@ -154,6 +154,8 @@ const [fare,setFare]=useState({})
       console.error("Error logging out:", error);
     }
   };
+
+  
   
 const fetchSuggestions = async (input) => {
   try {

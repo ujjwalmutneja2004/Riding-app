@@ -10,7 +10,7 @@ function initializeSocket(server) {
   io = new Server(server, {
     cors: {
       origin:[
-        "https://29dv0wmq-5173.inc1.devtunnels.ms",
+        // "https://29dv0wmq-5173.inc1.devtunnels.ms",
         "http://localhost:5173", // Replace with your frontend URL
         "https://travelx-five.vercel.app"
       ],

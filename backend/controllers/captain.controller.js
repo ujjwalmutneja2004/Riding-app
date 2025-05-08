@@ -39,7 +39,7 @@ module.exports.registerCaptain = async (req, res, next) => {
 
     const token=captain.generateAuthToken();
      res.cookie('token', token, {
-        httpOnly: true,  // Prevents client-side JS from accessing the cookie
+        // httpOnly: true,  // Prevents client-side JS from accessing the cookie
         secure: true,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
         sameSite: 'None', // Required for cross-site requests
         });
@@ -69,10 +69,11 @@ module.exports.loginCaptain = async (req, res, next) => {
 
     const token=captain.generateAuthToken();
     res.cookie('token', token, {
-        httpOnly: true,  // Prevents client-side JS from accessing the cookie
-        secure: true,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
+        // httpOnly: true,  // Prevents client-side JS from accessing the cookie
+        secure: false,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
         sameSite: 'None', // Required for cross-site requests
         });
+        console.log('Setting cookie', token);
     res.status(200).json({token,captain});
 }
 
@@ -89,18 +90,36 @@ module.exports.getCaptainProfile = async (req, res, next) => {
 
 
 module.exports.logoutCaptain = async (req, res, next) => {  
-    const token=req.cookies.token|| (req.headers.authorization && req.headers.authorization.split(' ')[1]);
-    if (!token) {
-        return res.status(400).json({ message: 'No token provided' });
+
+    try{
+        res.clearCookie("token", {
+             httpOnly: true,
+             secure: true,            // ✅ Must be true on HTTPS (Render uses HTTPS)
+             sameSite: 'None' ,
+             cache: 'no-store'   
+        });
+        res.set("Cache-Control", "no-store"); 
+    
+    
+        const token=req.cookies.token|| (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+        if (!token) {
+            return res.status(400).json({ message: 'No token provided' });
+        }
+        await blackListTokenModel.create({token});
+       
+        res.status(200).json({message:'Logout successfully'});
+
     }
-    await blackListTokenModel.create({token});
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: true,            // ✅ Must be true on HTTPS (Render uses HTTPS)
-         sameSite: 'None'    
-    });
-    res.set("Cache-Control", "no-store");  // ✅ Cache disable
-    res.status(200).json({message:'Logout successfully'});
+    catch(err){
+        res.status(500).json({message:'Something went wrong'})
+    }
+   
+    
+    
+    
+    
+    // ✅ Cache disable
+   
 }
 
 

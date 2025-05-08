@@ -91,9 +91,9 @@ module.exports.getUserProfile=async(req,res,next)=>{
 //we will putn it in blacklist so no one can access
 module.exports.logoutUser=async(req,res,next)=>{
     try{
-        res.clearCookie("token", {
+        res.clearCookie('token', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',  // Set to true for production environments
+            secure: true,  // Set to true for production environments
             sameSite: "None",
              
         });

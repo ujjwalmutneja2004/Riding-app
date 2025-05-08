@@ -18,11 +18,19 @@ const CaptainLogin = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
 
+    const captainData={
+      email: email,
+      password: password
+    }
+
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/captains/login`,
-        { email, password }
-      );
+      // const response = await axios.post(
+      //   `${import.meta.env.VITE_BASE_URL}/captains/login`,
+      //   { email, password }
+      // );
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captainData, {
+        withCredentials: true, // Ensure cookies are sent if required for authentication
+      });
 
       console.log('response', response);
 
@@ -93,7 +101,21 @@ const CaptainLogin = () => {
           Sign in as User
         </Link>
       </div>
+
+      <div>
+ 
+</div>
+
+      
+
+
+
     </div>
+
+    
+
+
+
   );
 };
 

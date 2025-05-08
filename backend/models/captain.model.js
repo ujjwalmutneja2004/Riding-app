@@ -26,6 +26,7 @@ const captainSchema=new mongoose.Schema({
         select:false,
         required:true,
     },
+    googleId: { type: String, unique: true }, // ✅ Add this for Google OAuth
     socketId:{
         type:String,
     },

@@ -94,6 +94,24 @@ export const Userlogin = () => {
       <div>
         <Link to='/captain-login' className='bg-[#10b461] flex items-center justify-center text-white font-semibold mb-4 rounded px-4 py-2  w-full text-lg  placeholder:text-base' >Sign in as Captain</Link> 
       </div>
+
+      <button
+  onClick={() => {
+    window.location.href = `${import.meta.env.VITE_BASE_URL}/auth/google`;
+  }}
+  className="flex items-center justify-center bg-white border border-gray-300 shadow-sm rounded px-4 py-2 w-full text-lg font-medium text-gray-600 hover:bg-gray-100"
+>
+  <img
+    src="https://cdn4.iconfinder.com/data/icons/logos-brands-7/512/google_logo-google_icongoogle-512.png"
+    alt="Google Logo"
+    className="w-5 h-5 mr-3"
+  />
+  Sign in with Google
+</button>
+
+
+
+
     </div>
   )
 }

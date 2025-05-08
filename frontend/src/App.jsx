@@ -54,7 +54,7 @@ const App = () => {
           </CaptainProtectWrapper>
         } />
 
-<      Route path="/Captain-riding" element={<CaptainRiding />} />
+    <Route path="/Captain-riding" element={<CaptainRiding />} />
 
       </Routes>
     </div>
