@@ -24,7 +24,8 @@ app.use(cors({
 origin: [
   "http://localhost:5173",
   // "https://29dv0wmq-5173.inc1.devtunnels.ms",
-  "https://travelx-five.vercel.app"
+  "https://travelx-five.vercel.app",
+  "https://riding-app.onrender.com" 
 ], // Explicit frontend URL
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization",
@@ -54,7 +55,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://travelx-five.vercel.app/auth/google/callback",
+      callbackURL: "https://riding-app.onrender.com/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
 
@@ -130,7 +131,7 @@ app.get(
       // Set the token as a cookie
       res.cookie('token', token, {
         secure: true,
-       // secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        // secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
         sameSite: 'None', // Required for cross-site cookies
       });
         
