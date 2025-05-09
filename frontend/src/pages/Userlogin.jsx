@@ -97,7 +97,7 @@ export const Userlogin = () => {
 
       <button
   onClick={() => {
-    window.location.href=`${import.meta.env.VITE_BASE_URL}/auth/google`;
+    window.location.replace=`${import.meta.env.VITE_BASE_URL}/auth/google`;
   }}
   className="flex items-center justify-center bg-white border border-gray-300 shadow-sm rounded px-4 py-2 w-full text-lg font-medium text-gray-600 hover:bg-gray-100"
 >
