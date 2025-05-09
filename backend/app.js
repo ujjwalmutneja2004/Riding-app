@@ -130,8 +130,8 @@ app.get(
 
       // Set the token as a cookie
       res.cookie('token', token, {
-        secure: true,
-        // secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        // secure: true,
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
         sameSite: 'None', // Required for cross-site cookies
       });
         
