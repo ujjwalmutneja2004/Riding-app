@@ -234,29 +234,69 @@ const CaptainHome = () => {
 
 
   
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
-        method: 'POST',
-        credentials: 'include', // Important for session-based authentication
-      });
+  // const handleLogout = async () => {
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
+  //       method: 'POST',
+  //       credentials: 'include', // Important for session-based authentication
+  //     });
 
-      if (response.ok) {
-        // Clear any authentication tokens if stored
-        localStorage.removeItem('token');
+  //     if (response.ok) {
+  //       // Clear any authentication tokens if stored
+  //       localStorage.removeItem('token');
 
-        console.log('Captain logout worked');
+  //       console.log('Captain logout worked');
 
-        // Redirect to login page
-        navigate('/captain-login'); 
-      } else {
-        console.error('Logout failed');
+  //       // Redirect to login page
+  //       navigate('/captain-login'); 
+  //     } else {
+  //       console.error('Logout failed');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error logging out:', error);
+  //   }
+  // };
+
+ 
+const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/captains/logout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
       }
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
+    );
+
+    if (response.status === 200) {
+      // Clear any authentication tokens if stored
+      localStorage.removeItem('token');
+      console.log('Captain logout worked');
+
+      // Redirect to login page
+      navigate('/captain-login'); 
+    } 
+  } catch (error) {
+    console.error('Error logging out:', error.response?.data || error.message);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+  
   return (
     <div className="h-screen">
       <div className="fixed p-6 top-0 flex items-center justify-between w-screen">
