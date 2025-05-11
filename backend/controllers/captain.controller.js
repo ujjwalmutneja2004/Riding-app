@@ -128,6 +128,7 @@ module.exports.logoutCaptain = async (req, res, next) => {
             secure: true,  // ✅ Must be true on HTTPS (Render uses HTTPS)
             sameSite: 'None',
             path: '/',
+            domain: 'travelx-five.vercel.app',
         });
 
         console.log("Cookie cleared");
