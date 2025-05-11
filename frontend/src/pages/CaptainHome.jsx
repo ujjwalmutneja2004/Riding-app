@@ -240,9 +240,6 @@ const CaptainHome = () => {
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
         method: 'POST',
         credentials: 'include', // Important for session-based authentication
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
       });
 
       if (response.ok) {
