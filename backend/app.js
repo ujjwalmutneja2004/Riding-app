@@ -138,7 +138,8 @@ app.get(
         
       console.log('Cookie set successfully');
       // Redirect to the frontend home page
-      res.redirect('https://travelx-five.vercel.app/home');
+       res.redirect(`https://travelx-five.vercel.app/set-token?token=${token}`);
+      // res.redirect('https://travelx-five.vercel.app/home');
     } catch (error) {
       console.error('Error in Google OAuth callback:', error);
       res.redirect('/login');
