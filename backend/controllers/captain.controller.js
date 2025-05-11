@@ -89,38 +89,64 @@ module.exports.getCaptainProfile = async (req, res, next) => {
 }
 
 
-module.exports.logoutCaptain = async (req, res, next) => {  
+// module.exports.logoutCaptain = async (req, res, next) => {  
 
-    try{
-         console.log("Logout route hit in captain currently in captain controoller");
+//     try{
+//          console.log("Logout route hit in captain currently in captain controoller");
+//         res.clearCookie('token', {
+//              httpOnly: true,
+//              secure: true,            // ✅ Must be true on HTTPS (Render uses HTTPS)
+//              sameSite: 'None' ,
+//              // cache: 'no-store'   
+//         });
+//         res.set("Cache-Control", "no-store"); 
+    
+    
+//         const token=req.cookies.token|| (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+//         if (!token) {
+//             return res.status(400).json({ message: 'No token provided' });
+//         }
+//         await blackListTokenModel.create({token});
+       
+//         res.status(200).json({message:'Logout successfully'});
+
+//     }
+//     catch(err){
+//         res.status(500).json({message:'Something went wrong'})
+//     }  
+// }
+module.exports.logoutCaptain = async (req, res, next) => {  
+    console.log("Inside logoutCaptain controller - Starting execution");
+
+    try {
+        console.log("Clearing cookie...");
         res.clearCookie('token', {
-             httpOnly: true,
-             secure: true,            // ✅ Must be true on HTTPS (Render uses HTTPS)
-             sameSite: 'None' ,
-             // cache: 'no-store'   
+            httpOnly: true,
+            secure: true,  // ✅ Must be true on HTTPS (Render uses HTTPS)
+            sameSite: 'None',
+            path: '/',
         });
-        res.set("Cache-Control", "no-store"); 
-    
-    
-        const token=req.cookies.token|| (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+
+        console.log("Cookie cleared");
+
+        const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+        console.log("Token extracted:", token);
+
         if (!token) {
+            console.log("No token provided");
             return res.status(400).json({ message: 'No token provided' });
         }
-        await blackListTokenModel.create({token});
-       
-        res.status(200).json({message:'Logout successfully'});
 
+        await blackListTokenModel.create({ token });
+        console.log("Token blacklisted successfully");
+
+        res.status(200).json({ message: 'Logout successfully' });
+
+    } catch (err) {
+        console.log("Error in logout route:", err);
+        res.status(500).json({ message: 'Something went wrong' });
     }
-    catch(err){
-        res.status(500).json({message:'Something went wrong'})
-    }
-   
-    
-    
-    
-    
-    // ✅ Cache disable
-   
-}
+};
+
 
 
