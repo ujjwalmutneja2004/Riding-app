@@ -73,6 +73,8 @@ module.exports.loginCaptain = async (req, res, next) => {
         // httpOnly: true,  // Prevents client-side JS from accessing the cookie
         secure: false,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
         sameSite: 'None', // Required for cross-site requests
+        path: '/',
+        domain: 'riding-app.onrender.com',
         });
         console.log('Setting cookie', token);
     res.status(200).json({token,captain});
