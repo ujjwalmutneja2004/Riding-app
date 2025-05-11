@@ -92,11 +92,12 @@ module.exports.getCaptainProfile = async (req, res, next) => {
 module.exports.logoutCaptain = async (req, res, next) => {  
 
     try{
-        res.clearCookie("token", {
+         console.log("Logout route hit in captain currently in captain controoller");
+        res.clearCookie('token', {
              httpOnly: true,
              secure: true,            // ✅ Must be true on HTTPS (Render uses HTTPS)
              sameSite: 'None' ,
-             cache: 'no-store'   
+             // cache: 'no-store'   
         });
         res.set("Cache-Control", "no-store"); 
     
