@@ -237,7 +237,7 @@ const CaptainHome = () => {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/captains/logout', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
         method: 'POST',
         credentials: 'include', // Important for session-based authentication
         headers: {
