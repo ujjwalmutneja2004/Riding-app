@@ -32,32 +32,43 @@ module.exports.authUser=async(req,res,next)=>{
 
 }
 
+module.exports.authCaptain = async (req, res, next) => {
+    console.log('🔵 [authCaptain] Middleware hit for route:', req.originalUrl);
 
-module.exports.authCaptain=async(req,res,next)=>{
     const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+    console.log("🔵 [authCaptain] Extracted Token:", token);
 
-    if(!token){
-        return res.status(401).json({message:'Unauthenticated'})
+    if (!token) {
+        console.log("🔴 [authCaptain] No token provided - Unauthenticated");
+        return res.status(401).json({ message: 'Unauthenticated' });
     }
 
-    const isBlacklisted=await blacklistTokenModel.findOne({token})
-    if(isBlacklisted){
-        return res.status(401).json({message:'Unauthorized'})
-    }
+    try {
+        // Check if token is blacklisted
+        const isBlacklisted = await blacklistTokenModel.findOne({ token });
+        if (isBlacklisted) {
+            console.log("🔴 [authCaptain] Token is blacklisted:", token);
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
 
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("🟢 [authCaptain] Decoded Token:", decoded);
 
-    try{
-        const decoded=jwt.verify(token,process.env.JWT_SECRET);
-        console.log("Decoded token:", decoded); 
-        //decoded me vahi data ayega jo encrypt karna vkt ayega means id
-        const captain=await captainmodel.findById(decoded._id);
-        console.log("cap",captain)
-        req.captain=captain;
-        return next();
-    }
-    catch(err){
-        console.log(err)
-        return res.status(401).json({message:'Unauthorized pakka'})
-    }
+        // Fetch the captain document
+        const captain = await captainmodel.findById(decoded._id);
+        console.log("🟢 [authCaptain] Captain found:", captain);
 
-}
+        if (!captain) {
+            console.log("🔴 [authCaptain] Captain not found with ID:", decoded._id);
+            return res.status(401).json({ message: 'Unauthorized - Captain not found' });
+        }
+
+        req.captain = captain;
+        next();  // Proceed to the controller
+
+    } catch (err) {
+        console.log("🔴 [authCaptain] JWT Verification Error:", err.message);
+        return res.status(401).json({ message: 'Unauthorized - Invalid or expired token' });
+    }
+};
