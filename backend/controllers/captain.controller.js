@@ -40,6 +40,7 @@ module.exports.registerCaptain = async (req, res, next) => {
     const token=captain.generateAuthToken();
      res.cookie('token', token, {
         // httpOnly: true,  // Prevents client-side JS from accessing the cookie
+        secure: process.env.NODE_ENV === 'production',
         secure: true,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
         sameSite: 'None', // Required for cross-site requests
         });
