@@ -81,7 +81,8 @@ function initializeSocket(server) {
 
 
 function sendMessageToSocketId(socketId, messageObject) {
-  console.log("Sending message to socket ID of all captains in radius :", messageObject);
+    console.log("Sending message to socket ID:", socketId, messageObject);
+  // console.log("Sending message to socket ID of all captains in radius :", messageObject);
   if (io) {
     io.to(socketId).emit(messageObject.event, messageObject.data);
   } else {

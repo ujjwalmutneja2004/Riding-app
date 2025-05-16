@@ -92,7 +92,10 @@ const CaptainHome = () => {
 
   useEffect(() => {
     if (!captain?._id) return;
-  
+
+
+ 
+
     // Join the socket room
     socket.emit('join', {
       userId: captain._id,

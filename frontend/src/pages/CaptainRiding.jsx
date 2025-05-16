@@ -217,6 +217,19 @@ const CaptainRiding = () => {
   const { location: currentLocation } = useContext(LocationContext);
 
   const [distance, setDistance] = useState(null); // Add this line to define distance state
+  useEffect(() => {
+    if (!socket) return;
+
+    const handlePaymentSuccess = (data) => {
+      alert(`Payment of ₹${data.amount} received from user!`);
+    };
+
+    socket.on("payment-success", handlePaymentSuccess);
+
+    return () => {
+      socket.off("payment-success", handlePaymentSuccess);
+    };
+  }, [socket]);
 
   // useEffect(() => {
   //   if (currentLocation && ride?.destLat && ride?.destLng) {

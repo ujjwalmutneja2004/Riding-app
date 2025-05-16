@@ -12,6 +12,13 @@ const mapsRoutes=require('./routes/maps.routes')
 const rideRoutes=require('./routes/ride.routes')
 const User = require('./models/user.model');
 
+const paymentRoutes = require("./routes/paymentRoutes");
+const Stripe = require('stripe');
+const stripe = new Stripe(process.env.SECRET_KEY);
+
+
+
+
 const app=express();
 //const port=process.env.PORT || 3000;
 
@@ -164,7 +171,7 @@ app.get('/',(req,res)=>{
     res.send('Hello World');
 })
 
-
+app.use('/api/payment', paymentRoutes);
 app.use('/users',userRoutes)
 
 console.log("entering register captain")
