@@ -264,7 +264,7 @@ const Riding = () => {
         </div>
 
         <Elements stripe={stripePromise}>
-          <PaymentForm ride={ride} />
+{/*           <PaymentForm ride={ride} /> */}
         </Elements>
       </div>
     </div>
