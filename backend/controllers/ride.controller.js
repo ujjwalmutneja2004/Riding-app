@@ -153,7 +153,8 @@ module.exports.startRide=async(req,res)=>{
       <p>Thank you for choosing TravelX.</p>
     `;
 
-    await sendEmail(userEmail, emailSubject, emailBody);
+    sendEmail(userEmail, emailSubject, emailBody)
+   .catch(err => console.error("Email failed:", err.message));
 
         res.status(200).json(ride);
     } catch (error) {
@@ -199,7 +200,8 @@ module.exports.endRide=async(req,res)=>{
           <p>Best regards,<br/>The TravelX Team</p>
         `;
     
-        await sendEmail(userEmail, emailSubject, emailBody);
+      sendEmail(userEmail, emailSubject, emailBody)
+  .catch(err => console.error("Email failed:", err.message));
 
         res.status(200).json(ride);
     } catch (error) {
