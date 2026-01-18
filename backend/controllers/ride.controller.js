@@ -153,10 +153,12 @@ module.exports.startRide=async(req,res)=>{
       <p>Thank you for choosing TravelX.</p>
     `;
 
+     res.status(200).json(ride);
+
     sendEmail(userEmail, emailSubject, emailBody)
    .catch(err => console.error("Email failed:", err.message));
 
-        res.status(200).json(ride);
+       
     } catch (error) {
         console.error("🔥 ERROR in Start Ride Controller:", error);
         return res.status(500).json({ message: error.message });
@@ -199,11 +201,13 @@ module.exports.endRide=async(req,res)=>{
           <p>We hope you had a great experience. We look forward to serving you again soon!</p>
           <p>Best regards,<br/>The TravelX Team</p>
         `;
+
+          res.status(200).json(ride);
     
       sendEmail(userEmail, emailSubject, emailBody)
   .catch(err => console.error("Email failed:", err.message));
 
-        res.status(200).json(ride);
+      
     } catch (error) {
         console.error("🔥 ERROR in End Ride Controller:", error);
         return res.status(500).json({ message: error.message });
