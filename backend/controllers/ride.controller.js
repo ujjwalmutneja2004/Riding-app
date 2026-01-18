@@ -156,7 +156,7 @@ module.exports.startRide=async(req,res)=>{
     sendEmail(userEmail, emailSubject, emailBody)
    .catch(err => console.error("Email failed:", err.message));
 
-     res.status(200).json(ride);
+    return res.status(200).json(ride);
        
     } catch (error) {
         console.error("🔥 ERROR in Start Ride Controller:", error);
@@ -204,7 +204,7 @@ module.exports.endRide=async(req,res)=>{
      sendEmail(userEmail, emailSubject, emailBody)
    .catch(err => console.error("Email failed:", err.message));
 
-     res.status(200).json(ride);
+    return res.status(200).json(ride);
       
     } catch (error) {
         console.error("🔥 ERROR in End Ride Controller:", error);
