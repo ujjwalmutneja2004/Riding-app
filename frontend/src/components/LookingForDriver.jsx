@@ -43,7 +43,7 @@ const LookingForDriver = ({ createRide,pickup,destination,fare,vehicleType, setV
                         <i className="ri-money-pound-box-fill"></i>
                         <div >
                             <h3 className='text-lg font-medium'>{fare[vehicleType]}</h3>
-                            <p className='text-sm mt-1 text-gray-600'>Cash Cash</p>
+                            <p className='text-sm mt-1 text-gray-600'>Cash\Card</p>
                         </div>
                     </div>
 
