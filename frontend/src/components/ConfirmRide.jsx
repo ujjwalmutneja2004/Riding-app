@@ -44,8 +44,8 @@ const ConfirmRide = ({ fare,vehicleType,pickup,destination ,createRide, setVehic
            <div className='flex items-center gap-5 p-3 '>
            <i className="ri-money-pound-box-fill"></i>
            <div >
-            <h3 className='text-lg font-medium'>{fare[vehicleType]}</h3>
-            <p className='text-sm mt-1 text-gray-600'>Cash Cash</p>
+            <h3 className='text-lg font-medium'>₹{Math.round(fare?.[vehicleType] ?? 0)}</h3>
+            <p className='text-sm mt-1 text-gray-600'>Cash/Card</p>
            </div>
            </div>
 
