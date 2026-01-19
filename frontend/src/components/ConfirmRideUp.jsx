@@ -166,8 +166,8 @@ const ConfirmRidePopUp = (props) => {
           <div className="flex items-center gap-5 p-3">
             <i className="ri-currency-line"></i>
             <div>
-              <h3 className="text-lg font-medium">₹{props.ride?.fare}</h3>
-              <p className="text-sm -mt-1 text-gray-600">Cash Cash</p>
+              <h3 className="text-lg font-medium">₹{Math.round(props.ride?.fare ?? 0)}</h3>
+              <p className="text-sm -mt-1 text-gray-600">Cash\Card</p>
             </div>
           </div>
         </div>
