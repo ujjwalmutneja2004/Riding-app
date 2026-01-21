@@ -29,7 +29,7 @@ const VehiclePanel = ({selectVehicle, fare,setVehiclePanel, setConfirmRidePanel 
         selectVehicle("motorcycle") 
       }}
            className="flex border-2 active:border-black rounded-lg mb-2 w-full p-3 items-center justify-between">
-        <img className="h-10" src="https://www.freepik.com/premium-vector/motorcycle-bike-uber-delivery-mobility-service-cute-illustration-transportation-electric-vehicle_227526929.htm" alt="carpng"/>
+        <img className="h-12" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnCwXru-a8075FntgQ3foHUrsz7PXsRH4ZMTgP9MFn8A&s&ec=121507586" alt="carpng"/>
         <div className="-ml-2 w-1/2">
           <h4 className="font-medium text-base"> Moto <span><i className="ri-user-3-fill"></i>1</span></h4>
           <h5 className="font-medium text-sm">3 min away</h5>
@@ -45,7 +45,7 @@ const VehiclePanel = ({selectVehicle, fare,setVehiclePanel, setConfirmRidePanel 
          selectVehicle("auto") 
       }}
            className="flex border-2 active:border-black rounded-lg mb-2 w-full p-3 items-center justify-between">
-        <img className="h-10" src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_368,w_552/v1648431773/assets/1d/db8c56-0204-4ce4-81ce-56a11a07fe98/original/Uber_Auto_558x372_pixels_Desktop.png" alt="carpng"/>
+        <img className="h-12" src="https://img.icons8.com/color/1200/auto-rickshaw.jpg" alt="carpng"/>
         <div className="ml-2 w-1/2">
           <h4 className="font-medium text-base">Auto <span><i className="ri-user-3-fill"></i>3</span></h4>
           <h5 className="font-medium text-sm">2 min away</h5>
