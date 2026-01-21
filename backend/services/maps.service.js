@@ -287,7 +287,7 @@ async function getAutoCompleteSuggestionss(input) {
 //     return captains;
 // }
 
-const getCaptainInTheRadius = async (lat, lng, radius) => {
+const getCaptainInTheRadius = async (lat, lng, radius,vehicleType) => {
     try {
         console.log(`Searching within ${radius} kms) around (${lat}, ${lng})`);
       const captains = await captainModel.find({
