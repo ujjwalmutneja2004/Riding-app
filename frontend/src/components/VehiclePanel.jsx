@@ -29,7 +29,7 @@ const VehiclePanel = ({selectVehicle, fare,setVehiclePanel, setConfirmRidePanel 
         selectVehicle("motorcycle") 
       }}
            className="flex border-2 active:border-black rounded-lg mb-2 w-full p-3 items-center justify-between">
-        <img className="h-10" src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_368,w_552/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png" alt="carpng"/>
+        <img className="h-10" src="https://www.freepik.com/premium-vector/motorcycle-bike-uber-delivery-mobility-service-cute-illustration-transportation-electric-vehicle_227526929.htm" alt="carpng"/>
         <div className="-ml-2 w-1/2">
           <h4 className="font-medium text-base"> Moto <span><i className="ri-user-3-fill"></i>1</span></h4>
           <h5 className="font-medium text-sm">3 min away</h5>
