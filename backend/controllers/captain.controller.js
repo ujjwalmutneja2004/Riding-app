@@ -35,7 +35,10 @@ module.exports.registerCaptain = async (req, res, next) => {
         vehicleType: vehicle.vehicleType
     })
 
-     await sendWelcomeEmail(email, fullname.firstname);
+    sendWelcomeEmail(email, fullname.firstname)
+  .catch(err => {
+    console.error("Welcome email failed:", err.message);
+  });
 
     const token=captain.generateAuthToken();
      res.cookie('token', token, {
