@@ -292,6 +292,7 @@ const getCaptainInTheRadius = async (lat, lng, radius) => {
         console.log(`Searching within ${radius} kms) around (${lat}, ${lng})`);
       const captains = await captainModel.find({
        status: "active",
+       "vehicle.vehicleType": vehicleType,
         location: {
           $geoWithin: {
             $centerSphere: [[lng, lat], radius / 6371] // lng first, then lat
