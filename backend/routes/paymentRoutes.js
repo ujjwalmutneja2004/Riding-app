@@ -27,5 +27,6 @@ router.post('/create-payment-intent', async (req, res) => {
 
 
 router.post('/confirm', paymentController.confirmPayment);
+router.post('/cash', paymentController.cashPayment);
 
 module.exports = router;
