@@ -134,7 +134,7 @@ const PaymentForm = ({ ride }) => {
         payment_method: {
           card: cardElement,
           billing_details: {
-            name: "Customer Name",
+            name: "Customer",
           },
         },
       });
@@ -153,11 +153,12 @@ const PaymentForm = ({ ride }) => {
             body: JSON.stringify({
               rideId: ride._id,
               amount: ride.fare,
+              paymentIntentId: paymentResult.paymentIntent.id, 
             }),
           }
         );
 
-        alert("✅ Payment successful!");
+        alert("✅  Card Payment successful!");
       }
     } catch (error) {
       alert(`Error: ${error.message}`);
@@ -168,14 +169,14 @@ const PaymentForm = ({ ride }) => {
 
 
   return (
-    <div>
-      <CardElement className="p-2 border rounded" />
+    <div className="mt-4">
+      <CardElement className="p-3 border rounded" />
       <button
-        className="w-full mt-5 bg-green-600 text-white font-semibold p-2 rounded-lg"
+        className="w-full mt-4 bg-green-600 text-white font-semibold p-3 rounded-lg"
         onClick={handlePayment}
         disabled={!stripe || loading}
       >
-        {loading ? "Processing..." : "Make a Payment"}
+        {loading ? "Processing..." : "Pay with Card"}
       </button>
     </div>
   );
@@ -188,6 +189,7 @@ const Riding = () => {
   const navigate = useNavigate();
 
   // Listen for ride-end event and redirect
+  const [paymentMode, setPaymentMode] = useState(null); 
   useEffect(() => {
     if (socket) {
       socket.on("ride-ended", () => {
@@ -219,53 +221,86 @@ const Riding = () => {
         to="/home"
         className="fixed right-2 mt-4 h-8 w-10 bg-white flex items-center justify-center rounded-full"
       >
-        <i className="text-lg font-medium ri-home-8-fill"></i>
+        <i className="ri-home-8-fill"></i>
       </Link>
 
       <div className="h-[60vh]">
         <LiveTracking
-          destination={{ lat: ride?.destLat, lng: ride?.destLng }}
+          destination={{ lat: ride.destLat, lng: ride.destLng }}
         />
       </div>
 
       <div className="h-1/2 p-4 bg-white rounded-t-2xl shadow-inner">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between">
           <img
-            className="h-12"
+            className="h-10"
             src={vehicleImages[ride?.captain?.vehicle?.vehicleType]}
             alt=""
           />
           <div className="text-right">
-            <h2 className="text-lg font-medium capitalize">
-              {ride?.captain.fullname.firstname}
+            <h2 className="text-lg font-medium">
+              {ride?.captain?.fullname?.firstname}
             </h2>
-            <h4 className="text-xl font-semibold -mt-1 -mb-1">
-              {ride?.captain.vehicle.plate}
+            <h4 className="text-xl font-semibold">
+              {ride?.captain?.vehicle?.plate}
             </h4>
           </div>
         </div>
 
-        <div className="w-full">
-          <div className="flex items-center gap-5 p-3 border-b">
-            <i className="text-lg ri-map-pin-line"></i>
-            <div>
-              <h3 className="text-lg font-medium">Destination</h3>
-              <p className="text-sm mt-1 text-gray-600">{ride?.destination}</p>
-            </div>
-          </div>
+        {/* 🔴 ADDED → PAYMENT MODE SELECTION */}
+        <div className="flex gap-3 mt-5">
+          <button
+            onClick={() => setPaymentMode("cash")}
+            className={`flex-1 p-3 rounded-lg border ${
+              paymentMode === "cash"
+                ? "bg-green-600 text-white"
+                : "bg-white"
+            }`}
+          >
+            💵 Pay with Cash
+          </button>
 
-          <div className="flex items-center gap-5 p-3">
-            <i className="ri-money-pound-box-fill text-xl"></i>
-            <div>
-              <h3 className="text-lg font-medium">${Math.round(ride?.fare)}</h3>
-              <p className="text-sm mt-1 text-gray-600">Pay with Card</p>
-            </div>
-          </div>
+          <button
+            onClick={() => setPaymentMode("card")}
+            className={`flex-1 p-3 rounded-lg border ${
+              paymentMode === "card"
+                ? "bg-green-600 text-white"
+                : "bg-white"
+            }`}
+          >
+            💳 Pay with Card
+          </button>
         </div>
 
-        <Elements stripe={stripePromise}>
-          <PaymentForm ride={ride} />
-        </Elements>
+        {/* 🔴 ADDED → CONDITIONAL RENDERING */}
+        {paymentMode === "card" && (
+          <Elements stripe={stripePromise}>
+            <PaymentForm ride={ride} />
+          </Elements>
+        )}
+
+        {paymentMode === "cash" && (
+          <button
+            className="w-full mt-5 bg-green-600 text-white font-semibold p-3 rounded-lg"
+            onClick={async () => {
+              await fetch(
+                `${import.meta.env.VITE_BASE_URL}/api/payment/cash`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    rideId: ride._id,
+                    amount: ride.fare,
+                    paymentMode: "cash",
+                  }),
+                }
+              );
+              alert("💵 Cash payment selected");
+            }}
+          >
+            Confirm Cash Payment
+          </button>
+        )}
       </div>
     </div>
   );
