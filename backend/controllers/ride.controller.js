@@ -32,6 +32,8 @@ module.exports.createRide = async (req, res) => {
             pickup,
             destination,
             vehicleType,
+             paymentMode: "cash",
+            paymentStatus: "pending",
             destLat: destCoordinates.lat,
             destLng: destCoordinates.lng,
             pickupLat: pickupcoordinates.lat,
