@@ -65,9 +65,16 @@ const rideSchema=new mongoose.Schema({
       destLng: {
         type: Number,
         required: true
-      }
+      },
+     paymentMode: {
+     type: String,
+     enum: ["cash", "card"],
+   },
+   paymentStatus: {
+  type: String,
+  enum: ["pending", "paid"],
+  },
       
-
 })
 
 module.exports= mongoose.model('ride',rideSchema);
