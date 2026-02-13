@@ -224,10 +224,17 @@ const CaptainRiding = () => {
       alert(`Payment of ₹${data.amount} received from user!`);
     };
 
+     const handleCashPaymentSelected = (data) => {
+    alert(`💵 Customer will pay ₹${data.amount} in cash`);
+  };
+
+
     socket.on("payment-success", handlePaymentSuccess);
+    socket.on("cash-payment-selected", handleCashPaymentSelected);
 
     return () => {
       socket.off("payment-success", handlePaymentSuccess);
+       socket.off("cash-payment-selected", handleCashPaymentSelected);
     };
   }, [socket]);
 
