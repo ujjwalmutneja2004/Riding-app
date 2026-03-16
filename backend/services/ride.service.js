@@ -73,7 +73,8 @@ module.exports.createRide=async ({
     user,pickup,destination,vehicleType,pickupLat,
     pickupLng,
     destLat,
-    destLng
+    destLng,
+    rideMode
 }) => {
     if(!user || !pickup || !destination || !vehicleType) {
         throw new Error('All fields are required to create a ride.');
@@ -101,7 +102,8 @@ module.exports.createRide=async ({
         destLat,
         destLng,
         distance,
-        duration
+        duration,
+        rideMode
 
     });
 

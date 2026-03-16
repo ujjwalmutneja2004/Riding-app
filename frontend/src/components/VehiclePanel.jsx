@@ -1,6 +1,6 @@
 import React from 'react';
 
-const VehiclePanel = ({selectVehicle, fare,setVehiclePanel, setConfirmRidePanel }) => {
+const VehiclePanel = ({selectVehicle, fare,setVehiclePanel, setRideModePanelOpen }) => {
   return (
     <div>
       <h5 className="p-1 text-center w-[93%] absolute top-0" 
@@ -12,7 +12,7 @@ const VehiclePanel = ({selectVehicle, fare,setVehiclePanel, setConfirmRidePanel 
 
       <div onClick={() =>{
         selectVehicle("car")   
-      setConfirmRidePanel(true)}}
+      setRideModePanelOpen(true)}}
            className="flex border-2 active:border-black rounded-lg mb-2 w-full p-3 items-center justify-between">
         <img className="h-10" src="https://www.pngplay.com/wp-content/uploads/8/Uber-PNG-Photos.png" alt="carpng"/>
         <div className="ml-2 w-1/2">
@@ -25,7 +25,7 @@ const VehiclePanel = ({selectVehicle, fare,setVehiclePanel, setConfirmRidePanel 
         </h2>
       </div>
 
-      <div onClick={() =>{ setConfirmRidePanel(true)
+      <div onClick={() =>{ setRideModePanelOpen(true)
         selectVehicle("motorcycle") 
       }}
            className="flex border-2 active:border-black rounded-lg mb-2 w-full p-3 items-center justify-between">
@@ -41,7 +41,7 @@ const VehiclePanel = ({selectVehicle, fare,setVehiclePanel, setConfirmRidePanel 
 
       </div>
 
-      <div onClick={() =>{ setConfirmRidePanel(true)
+      <div onClick={() =>{ setRideModePanelOpen(true)
          selectVehicle("auto") 
       }}
            className="flex border-2 active:border-black rounded-lg mb-2 w-full p-3 items-center justify-between">

@@ -20,7 +20,7 @@ module.exports.createRide = async (req, res) => {
 
 
 
-    const { userId, pickup, destination, vehicleType } = req.body;
+    const { userId, pickup, destination, vehicleType, rideMode } = req.body;
     const destCoordinates = await mapServices.getAddressCoordinate(destination);
     const pickupcoordinates=await mapServices.getAddressCoordinate(pickup);
 
@@ -32,6 +32,7 @@ module.exports.createRide = async (req, res) => {
             pickup,
             destination,
             vehicleType,
+            rideMode: rideMode || 'Chill Mode',
              paymentMode: "cash",
             paymentStatus: "pending",
             destLat: destCoordinates.lat,
