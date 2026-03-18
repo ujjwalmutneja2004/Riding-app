@@ -195,70 +195,129 @@ const UserSignup = () => {
     };
 
     return (
-        <div className='p-5 h-screen flex flex-col justify-between'>
-            <div>
-                <img className="w-21 h-20 mb-2" src={logo} alt="Logo" />
-                <form onSubmit={submitHandler}>
-                    <h3 className='text w-1/2 font-medium mb-2'>What's your name</h3>
-                    <div className='flex gap-4 mb-6'>
-                        <input
-                            required
-                            className='bg-[#eeeeee] w-1/2 rounded px-4 py-1 border text-base placeholder:text-sm'
-                            type="text"
-                            placeholder='Firstname'
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
-                        />
-                        <input
-                            required
-                            className='bg-[#eeeeee] w-1/2 rounded px-4 py-1 border text-base placeholder:text-sm'
-                            type="text"
-                            placeholder='Lastname'
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
-                        />
-                    </div>
-
-                    <h3 className='text-base font-medium mb-2'>Enter your Email</h3>
-                    <input
-                        required
-                        className='bg-[#eeeeee] mb-5 rounded px-4 py-2 border w-full text-base placeholder:text-sm'
-                        type="email"
-                        placeholder='email@example.com'
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                {/* Logo */}
+                <div className="text-center">
+                    <img
+                        className="mx-auto h-14 w-auto sm:h-16 object-contain"
+                        src={logo}
+                        alt="TravelX Logo"
                     />
+                </div>
 
-                    <h3 className='text-base font-medium mb-2'>Enter Password</h3>
-                    <div className='relative w-full mb-6'>
-                        <input
-                            className='bg-[#eeeeee] rounded px-4 py-2 border w-full text-base placeholder:text-sm'
-                            required
-                            type={showPassword ? "text" : "password"}  // 🔹 Toggle visibility
-                            placeholder='password'
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <span
-                            className='absolute right-4 top-3 cursor-pointer'
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
-                            {showPassword ? <FaEyeSlash /> : <FaEye />}
-                        </span>
+                {/* Card */}
+                <div className="mt-6 sm:mt-8 bg-white py-8 px-6 sm:px-10 shadow-xl rounded-2xl border border-gray-100">
+                    <form className="space-y-6" onSubmit={submitHandler}>
+                        {/* Name fields */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Full name
+                            </label>
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1">
+                                    <input
+                                        required
+                                        type="text"
+                                        placeholder="First name"
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <input
+                                        required
+                                        type="text"
+                                        placeholder="Last name"
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                                Email address
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    placeholder="email@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password */}
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                Password
+                            </label>
+                            <div className="mt-1 relative">
+                                <input
+                                    id="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    autoComplete="new-password"
+                                    required
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? (
+                                        <FaEyeSlash className="h-5 w-5" />
+                                    ) : (
+                                        <FaEye className="h-5 w-5" />
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Submit */}
+                        <div>
+                            <button
+                                type="submit"
+                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition-colors"
+                            >
+                                Create account
+                            </button>
+                        </div>
+
+                        {/* Sign in link */}
+                        <div className="text-center text-sm">
+                            <p className="text-gray-600">
+                                Already have an account?{' '}
+                                <Link
+                                    to="/login"
+                                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                                >
+                                    Sign in
+                                </Link>
+                            </p>
+                        </div>
+                    </form>
+
+                    {/* Footer notice */}
+                    <div className="mt-4">
+                        <p className="text-xs text-gray-500 text-center leading-relaxed">
+                            By proceeding, you consent to receive calls, WhatsApp, or SMS messages, including automated messages, from TravelX and its affiliates to the number provided.
+                        </p>
                     </div>
-
-                    <button className='bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-lg'>Create Account</button>
-
-                    <p className='text-center text-sm'>
-                        Already have an account? <Link to='/login' className='text-blue-600'>Sign In</Link>
-                    </p>
-                </form>
-            </div>
-
-            <div>
-                <p className='text-[10px] leading-tight text-center'>
-                    By proceeding, you consent to receive calls, WhatsApp, or SMS messages, including automated messages, from Uber and its affiliates to the number provided.
-                </p>
+                </div>
             </div>
         </div>
     );
