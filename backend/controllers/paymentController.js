@@ -91,7 +91,10 @@ const cashPayment = async (req, res) => {
   // captain ko batao
   if (ride?.captain?.socketId) {
     sendMessageToSocketId(ride.captain.socketId, {
-      event: "cash-payment-selected"
+      event: "cash-payment-selected",
+    data: {
+    amount: ride.fare || 0
+    }
     });
   }
 
