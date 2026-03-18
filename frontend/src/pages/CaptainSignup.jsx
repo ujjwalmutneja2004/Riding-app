@@ -65,71 +65,193 @@ const CaptainSignup = () => {
   };
 
   return (
-    <div className="py-5 px-5 h-screen flex flex-col justify-between bg-gray-100">
-      <ToastContainer position="top-right" autoClose={3000} /> {/* ✅ Toast Container */}
-      
-      <div>
-         <img className="w-21 h-20 mb-2" src={logo} alt="Logo" />
+   <div className="min-h-screen bg-gray-50 flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+      <ToastContainer position="top-right" autoClose={3000} />
 
-        <form onSubmit={submitHandler} className="bg-white p-5 rounded-lg shadow-md">
-          <h3 className="text-lg font-medium mb-2">What's our Captain's name</h3>
-          <div className="flex gap-4 mb-7">
-            <input required className="bg-gray-200 w-1/2 rounded-lg px-4 py-2 border text-lg placeholder:text-base"
-              type="text" placeholder="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-            <input required className="bg-gray-200 w-1/2 rounded-lg px-4 py-2 border text-lg placeholder:text-base"
-              type="text" placeholder="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-          </div>
+      <div className="w-full max-w-5xl xl:max-w-6xl">
+        {/* Smaller logo */}
+        <div className="text-center mb-5">
+          <img
+            className="mx-auto h-10 w-auto sm:h-12 object-contain"
+            src={logo}
+            alt="TravelX Logo"
+          />
+        </div>
 
-          <h3 className="text-lg font-medium mb-1">What's our Captain's email</h3>
-          <input required className="bg-gray-200 mb-5 rounded-lg px-4 py-2 border w-full text-lg placeholder:text-base"
-            type="email" placeholder="email@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <div className="bg-white py-6 px-6 sm:px-8 lg:px-10 shadow-xl rounded-2xl border border-gray-200">
+          <form onSubmit={submitHandler} className="space-y-5">
+            {/* Name fields - 2 columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  First name
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="First name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Last name
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="Last name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                />
+              </div>
+            </div>
 
-          <h3 className="text-lg font-medium mb-1">Enter Password</h3>
-          <div className="relative mb-3">
-            <input required className="bg-gray-200 rounded-lg px-4 py-2 border w-full text-lg placeholder:text-base pr-10"
-              type={showPassword ? "text" : "password"} placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button type="button" className="absolute right-3 top-3 text-gray-600"
-              onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
+            {/* Email + Password - side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Email address
+                </label>
+                <input
+                  required
+                  type="email"
+                  placeholder="email@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                />
+              </div>
 
-          <h3 className="text-lg font-medium mb-2">Vehicle Information</h3>
-          <div className="flex gap-4 mb-7">
-            <input required className="bg-gray-200 w-1/2 rounded-lg px-4 py-2 border text-lg placeholder:text-base"
-              type="text" placeholder="Vehicle Color" value={vehicleColor} onChange={(e) => setVehicleColor(e.target.value)} />
-            <input required className="bg-gray-200 w-1/2 rounded-lg px-4 py-2 border text-lg placeholder:text-base"
-              type="text" placeholder="Vehicle Plate" value={vehiclePlate} onChange={(e) => setVehiclePlate(e.target.value)} />
-          </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    required
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash size={18} />
+                    ) : (
+                      <FaEye size={18} />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
 
-          <div className="flex gap-4 mb-7">
-            <input required className="bg-gray-200 w-1/2 rounded-lg px-4 py-2 border text-lg placeholder:text-base"
-              type="number" placeholder="Vehicle Capacity" value={vehicleCapacity} onChange={(e) => setVehicleCapacity(e.target.value)} />
-            <select required className="bg-gray-200 w-1/2 rounded-lg px-4 py-2 border text-lg placeholder:text-base"
-              value={vehicleType} onChange={(e) => setVehicleType(e.target.value)}>
-              <option value="" disabled>Select Vehicle Type</option>
-              <option value="car">Car</option>
-              <option value="auto">Auto</option>
-              <option value="motorcycle">Moto</option>
-            </select>
-          </div>
+            {/* Vehicle info - 4 columns on wide screens */}
+            <div className="pt-3">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                Vehicle Information
+              </h3>
 
-          <button className="bg-black text-white font-semibold mb-3 rounded-lg px-4 py-2 w-full text-lg" type="submit">
-            Create Captain Account
-          </button>
-        </form>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Color
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="Vehicle color"
+                    value={vehicleColor}
+                    onChange={(e) => setVehicleColor(e.target.value)}
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                  />
+                </div>
 
-        <p className="text-center">Already have an account?{" "}
-          <Link to="/captain-login" className="text-blue-600">Login here</Link>
-        </p>
-      </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Plate
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="e.g. PB10AB1234"
+                    value={vehiclePlate}
+                    onChange={(e) => setVehiclePlate(e.target.value)}
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                  />
+                </div>
 
-      <div>
-        <p className="text-xs mt-6 leading-tight">
-          This site is protected by reCAPTCHA and the{" "}
-          <span className="underline">Google Privacy Policy</span> and{" "}
-          <span className="underline">Terms of Service apply</span>.
-        </p>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Capacity
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    placeholder="Persons"
+                    value={vehicleCapacity}
+                    onChange={(e) => setVehicleCapacity(e.target.value)}
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Type
+                  </label>
+                  <select
+                    required
+                    value={vehicleType}
+                    onChange={(e) => setVehicleType(e.target.value)}
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base text-gray-700 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                  >
+                    <option value="" disabled>
+                      Select type
+                    </option>
+                    <option value="car">Car</option>
+                    <option value="auto">Auto</option>
+                    <option value="motorcycle">Motorcycle</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Button & link */}
+            <div className="pt-5 flex justify-center">
+              <div className="flex-row items-center gap-6 sm:gap-10">
+                <button
+                  type="submit"
+                  className="bg-black text-white font-semibold py-3 px-8 rounded-lg text-base hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all shadow-md min-w-[220px] sm:min-w-[260px]"
+                >
+                  Create Captain Account
+                </button>
+
+                <p className="text-sm text-gray-600 whitespace-nowrap mt-4 text-center">
+                  Already have an account?{" "}
+                  <Link
+                    to="/captain-login"
+                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                  >
+                    Login here
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </form>
+
+          <p className="mt-6 text-center text-xs text-gray-500">
+            This site is protected by reCAPTCHA and the Google Privacy Policy
+            and Terms of Service apply.
+          </p>
+        </div>
       </div>
     </div>
   );

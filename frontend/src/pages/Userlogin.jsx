@@ -53,67 +53,137 @@ export const Userlogin = () => {
 
 
   return (
-    <div className='p-7 h-screen flex flex-col justify-between'>
-      <div>
-{/*           <img className='w-16 mb-10'src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/2560px-Uber_logo_2018.svg.png" alt="logo" /> */}
-        
-         <img className='w-40 h-20 object-contain  mb-5'src={logo} alt="logo" /> 
-        <form onSubmit={(e)=>{
-            submitHandler(e)
-        }}>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        {/* Logo */}
+        <div className="text-center">
+          <img
+            className="mx-auto h-14 w-auto sm:h-16 object-contain"
+            src={logo}
+            alt="TravelX Logo"
+          />
+        </div>
 
-        <h3 className='text-lg font-medium mb-2'>What's your email</h3>
-          <input required 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)}
-            className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base' type="email" placeholder='email@example.com'/>
+        {/* Card */}
+        <div className="mt-8 bg-white py-8 px-6 shadow-xl rounded-2xl border border-gray-100">
+          <form className="space-y-6" onSubmit={submitHandler}>
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email address
+              </label>
+              <div className="mt-1">
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                  placeholder="email@example.com"
+                />
+              </div>
+            </div>
 
-        <h3 className='text-lg font-medium  mb-2' >Enter Password</h3>
-         <div className='relative w-full mb-6'>
-                                <input
-                                    className='bg-[#eeeeee] rounded px-4 py-2 border w-full text-base placeholder:text-sm'
-                                    required
-                                    type={showPassword ? "text" : "password"}  // 🔹 Toggle visibility
-                                    placeholder='password'
-                                    value={password}
-                                    onChange={(e) => setpassword(e.target.value)}
-                                />
-                                <span
-                                    className='absolute right-4 top-3 cursor-pointer'
-                                    onClick={() => setShowPassword(!showPassword)}
-                                >
-                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                </span>
-                            </div>
+            {/* Password */}
+            <div className="mt-1 relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setpassword(e.target.value)}
+                className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none pr-10"
+                placeholder="••••••••"
+              />
 
-        <button className='bg-[#111]  text-white font-semibold mb-3 rounded px-4 py-2  w-full text-lg' >Login</button>
+              {/* FIXED BUTTON */}
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <FaEyeSlash className="h-5 w-5" />
+                ) : (
+                  <FaEye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
 
-        <p className='text-center'>New here? <Link to='/Signup' className='text-blue-600'>Create New Account</Link></p>
-      </form>
+            {/* Login Button */}
+            <div>
+              <button
+                type="submit"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition-all"
+              >
+                Sign in
+              </button>
+            </div>
+
+            {/* Create account link */}
+            <div className="text-center text-sm">
+              <p className="text-gray-600">
+                New here?{" "}
+                <Link
+                  to="/signup"
+                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                >
+                  Create new account
+                </Link>
+              </p>
+            </div>
+          </form>
+
+          {/* Divider */}
+          <div className="mt-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom buttons */}
+            <div className="mt-6 space-y-4">
+              {/* Google Sign In */}
+              <button
+                onClick={() => {
+                  window.location.assign(
+                    `${import.meta.env.VITE_BASE_URL}/auth/google`,
+                  );
+                }}
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+              >
+                <img
+                  src="https://cdn4.iconfinder.com/data/icons/logos-brands-7/512/google_logo-google_icongoogle-512.png"
+                  alt="Google"
+                  className="h-5 w-5"
+                />
+                Sign in with Google
+              </button>
+
+              {/* Captain Login */}
+              <Link
+                to="/captain-login"
+                className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all"
+              >
+                Sign in as Captain
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
-      <div>
-        <Link to='/captain-login' className='bg-[#10b461] flex items-center justify-center text-white font-semibold mb-4 rounded px-4 py-2  w-full text-lg  placeholder:text-base' >Sign in as Captain</Link> 
-      </div>
-
-      <button
-  onClick={() => {
-    // window.location.assign=`${import.meta.env.VITE_BASE_URL}/auth/google`;
-     window.location.assign(`${import.meta.env.VITE_BASE_URL}/auth/google`);
-  }}
-  className="flex items-center justify-center bg-white border border-gray-300 shadow-sm rounded px-4 py-2 w-full text-lg font-medium text-gray-600 hover:bg-gray-100"
->
-  <img
-    src="https://cdn4.iconfinder.com/data/icons/logos-brands-7/512/google_logo-google_icongoogle-512.png"
-    alt="Google Logo"
-    className="w-5 h-5 mr-3"
-  />
-  Sign in with Google
-</button>
-
-
-
-
     </div>
-  )
+  );
 }
 export default Userlogin;

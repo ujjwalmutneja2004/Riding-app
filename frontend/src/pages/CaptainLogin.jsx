@@ -54,68 +54,105 @@ const CaptainLogin = () => {
   };
 
   return (
-    <div className='p-7 h-screen flex flex-col justify-between'>
-      <div>
-        <img className='w-40 h-20 object-contain mb-5'src={logo} alt="logo" />
-        <form onSubmit={submitHandler}>
-          <h3 className='text-lg font-medium mb-2'>What's your email</h3>
-          <input
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base'
-            type="email"
-            placeholder='email@example.com'
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        {/* Logo */}
+        <div className="flex justify-start mb-6 ">
+          <img
+            className="mx-auto h-14 w-auto sm:h-16 object-contain"
+            src={logo}
+            alt="TravelX Logo"
           />
+        </div>
 
-          <h3 className='text-lg font-medium mb-2'>Enter Password</h3>
-          <div className='relative w-full mb-6'>
-            <input
-              className='bg-[#eeeeee] rounded px-4 py-2 border w-full text-base placeholder:text-sm'
-              required
-              type={showPassword ? "text" : "password"}
-              placeholder='password'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <span
-              className='absolute right-4 top-3 cursor-pointer'
-              onClick={() => setShowPassword(!showPassword)}
+        {/* Card */}
+        <div className="mt-6 sm:mt-8 bg-white py-8 px-6 sm:px-10 shadow-xl rounded-2xl border border-gray-100">
+          <form className="space-y-6" onSubmit={submitHandler}>
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
+              <div className="mt-1">
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
+                  placeholder="email@example.com"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none pr-10"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="h-5 w-5" />
+                  ) : (
+                    <FaEye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div>
+              <button
+                type="submit"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition-colors"
+              >
+                Login
+              </button>
+            </div>
+
+            {/* Register link */}
+            <div className="text-center text-sm">
+              <p className="text-gray-600">
+                Join a fleet?{' '}
+                <Link
+                  to="/captain-signup"
+                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                >
+                  Register as a Captain
+                </Link>
+              </p>
+            </div>
+          </form>
+
+          {/* Sign in as User */}
+          <div className="mt-8">
+            <Link
+              to="/login"
+              className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
+              Sign in as User
+            </Link>
           </div>
-
-          <button className='bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-lg'>
-            Login
-          </button>
-
-          <p className='text-center'>
-            Join a fleet <Link to='/captain-signup' className='text-blue-600'>Register as a Captain</Link>
-          </p>
-        </form>
+        </div>
       </div>
-
-      <div>
-        <Link to='/login' className='bg-[#d5622d] flex items-center justify-center text-white font-semibold mb-4 rounded px-4 py-2 w-full text-lg'>
-          Sign in as User
-        </Link>
-      </div>
-
-      <div>
- 
-</div>
-
-      
-
-
-
     </div>
-
-    
-
-
-
   );
 };
 
