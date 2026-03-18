@@ -6,8 +6,9 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { CaptainDataContext } from '../context/CaptainContext';
 import axios from 'axios';
 import logo from '../assets/logoo.png';
+import PasswordResetPanel from "../components/PasswordResetPanel";
 
-const CaptainLogin = () => {
+const CaptainLogin = ({ resetPanelOpen, setResetPanelOpen }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -117,6 +118,17 @@ const CaptainLogin = () => {
               </div>
             </div>
 
+            {/* Forgot Password */}
+          <div className="text-right">
+            <button
+              type="button"
+              onClick={() => setResetPanelOpen(true)}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Forgot Password?
+            </button>
+          </div>
+
             {/* Submit Button */}
             <div>
               <button
@@ -156,4 +168,26 @@ const CaptainLogin = () => {
   );
 };
 
-export default CaptainLogin;
+export const CaptainLoginWrapper = () => {
+  const [resetPanelOpen, setResetPanelOpen] = useState(false);
+
+  return (
+    <>
+      <CaptainLogin
+        resetPanelOpen={resetPanelOpen}
+        setResetPanelOpen={setResetPanelOpen}
+      />
+      {resetPanelOpen && (
+        <PasswordResetPanel
+          basePath="captains"
+          accountType="Captain"
+          onClose={() => setResetPanelOpen(false)}
+          onSuccess={() => toast.success("Password updated")}
+        />
+      )}
+    </>
+  );
+};
+
+// export default CaptainLogin;
+export default CaptainLoginWrapper;
