@@ -7,8 +7,9 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';  // Import eye icons
 import logo from '../assets/logoo.png'
+import PasswordResetPanel from "../components/PasswordResetPanel";
 
-export const Userlogin = () => {
+export const Userlogin = ({ resetPanelOpen, setResetPanelOpen }) => {
   //two way binding
   //so that react ko pata lage ky kar rhe ho
   const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ export const Userlogin = () => {
   // const[userData,setUserData] = useState({});
     const [showPassword, setShowPassword] = useState(false); // 🔹 Toggle state
 
-  const {user,setUser}=useContext(UserDataContext)
+  const {user,setUser}=useContext(UserDataContext);
   const navigate=useNavigate();
 
 
@@ -116,6 +117,17 @@ export const Userlogin = () => {
               </button>
             </div>
 
+            {/* Forgot Password */}
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setResetPanelOpen(true)}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                Forgot Password?
+              </button>
+            </div>
+
             {/* Login Button */}
             <div>
               <button
@@ -186,4 +198,26 @@ export const Userlogin = () => {
     </div>
   );
 }
-export default Userlogin;
+
+export const UserloginWrapper = () => {
+  const [resetPanelOpen, setResetPanelOpen] = useState(false);
+
+  return (
+    <>
+      <Userlogin
+        resetPanelOpen={resetPanelOpen}
+        setResetPanelOpen={setResetPanelOpen}
+      />
+      {resetPanelOpen && (
+        <PasswordResetPanel
+          basePath="users"
+          accountType="User"
+          onClose={() => setResetPanelOpen(false)}
+          onSuccess={() => toast.success("Password updated")}
+        />
+      )}
+    </>
+  );
+};
+
+export default UserloginWrapper;

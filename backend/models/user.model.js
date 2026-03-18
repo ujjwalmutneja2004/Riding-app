@@ -32,6 +32,13 @@ const userSchema=new mongoose.Schema({
     socketId:{
         type:String,
     }
+     ,resetOtp:{
+        type:String,
+        select:false
+    },
+    resetOtpExpire:{
+        type:Date
+    }
 
 
 })
