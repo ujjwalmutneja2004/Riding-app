@@ -125,3 +125,17 @@ catch(err){
     res.status(500).json({message:'Something went wrong'})
 }
 }
+
+
+module.exports.getUserHistory = async (req, res, next) => {
+    try {
+        const rideModel = require('../models/ride.model');
+        const rides = await rideModel.find({ user: req.user._id, status: { $in: ['completed', 'cancelled'] } })
+            .populate('captain')
+            .sort({ _id: -1 });
+        res.status(200).json(rides);
+    } catch (err) {
+        console.error("Error fetching user history:", err);
+        res.status(500).json({ message: 'Failed to fetch ride history' });
+    }
+}

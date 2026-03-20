@@ -68,9 +68,24 @@ const captainSchema=new mongoose.Schema({
                 type:Number,
             }
 
+        },
+        ratings: [
+            {
+                user: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'user'
+                },
+                score: {
+                    type: Number,
+                    min: 1,
+                    max: 5
+                }
+            }
+        ],
+        averageRating: {
+            type: Number,
+            default: 0
         }
-      
-
     }
 )
 

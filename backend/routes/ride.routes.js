@@ -43,6 +43,12 @@ router.post('/end-ride',
 
 )
 
+router.post('/:id/rate',
+    authMiddleware.authUser,
+    body('rating').isNumeric().isInt({ min: 1, max: 5 }).withMessage('Rating must be an integer between 1 and 5'),
+    rideController.rateRide
+);
+
 router.get('/:captainId/earnings',getCaptainEarnings);
 
 

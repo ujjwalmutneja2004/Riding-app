@@ -305,12 +305,28 @@ const handleLogout = async () => {
       <div className="fixed p-6 top-0 flex items-center justify-between w-screen">
           <img className="w-20 h-15" src={logo} alt="Logo" />
 
-        <button
-          onClick={handleLogout}
-          className="h-8 w-10 bg-white flex items-center justify-center rounded-full"
-        >
-          <i className="text-lg font-medium ri-logout-box-line"></i>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/captain-history')}
+            className="h-8 w-10 bg-white flex items-center justify-center rounded-full shadow-md"
+          >
+            <i className="text-lg font-medium ri-history-line"></i>
+          </button>
+
+          <button
+            onClick={() => navigate('/captain-dashboard')}
+            className="h-8 w-10 bg-white flex items-center justify-center rounded-full shadow-md"
+          >
+            <i className="text-lg font-medium ri-bar-chart-grouped-line"></i>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="h-8 w-10 bg-white flex items-center justify-center rounded-full shadow-md"
+          >
+            <i className="text-lg font-medium ri-logout-box-line"></i>
+          </button>
+        </div>
       </div>
 
       <div className="h-3/5">

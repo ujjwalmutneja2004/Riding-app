@@ -226,6 +226,13 @@ async function createRide() {
      />
     )}
       <button
+        onClick={() => navigate('/user/history')}
+        className="absolute right-20 top-5 bg-white h-10 w-10 flex items-center justify-center rounded-full shadow-md z-50"
+      >
+        <i className="text-lg font-medium ri-history-line"></i>
+      </button>
+
+      <button
         onClick={handleLogout}
         className="absolute right-5 top-5 bg-white h-10 w-10 flex items-center justify-center rounded-full shadow-md z-50"
       >

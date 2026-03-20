@@ -156,4 +156,69 @@ module.exports.logoutCaptain = async (req, res, next) => {
 };
 
 
+module.exports.getCaptainHistory = async (req, res, next) => {
+    try {
+        const rideModel = require('../models/ride.model');
+        const rides = await rideModel.find({ captain: req.captain._id, status: { $in: ['completed', 'cancelled'] } })
+            .populate('user')
+            .sort({ _id: -1 });
+        res.status(200).json(rides);
+    } catch (err) {
+        console.error("Error fetching captain history:", err);
+        res.status(500).json({ message: 'Failed to fetch ride history' });
+    }
+};
+
+module.exports.getCaptainAnalytics = async (req, res, next) => {
+    try {
+        const rideModel = require('../models/ride.model');
+        const captainId = req.captain._id;
+
+        // Fetch all completed rides to compute stats in memory (more compatible across mongo versions than complex pipelines for a small scale app)
+        const rides = await rideModel.find({ captain: captainId, status: 'completed' });
+        
+        let totalEarnings = 0;
+        let totalRides = rides.length;
+        
+        // Compute last 7 days earnings
+        const today = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        
+        const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const thisYearStart = new Date(today.getFullYear(), 0, 1);
+        
+        let last7DaysEarnings = 0;
+        let thisMonthEarnings = 0;
+        let thisYearEarnings = 0;
+
+        rides.forEach(ride => {
+            const fare = ride.fare || 0;
+            totalEarnings += fare;
+            
+            // For simplicity, we use the internal MongoDB timestamp (_id) if no createdAt is defined
+            const rideDate = ride._id.getTimestamp();
+            
+            if (rideDate >= sevenDaysAgo) last7DaysEarnings += fare;
+            if (rideDate >= thisMonthStart) thisMonthEarnings += fare;
+            if (rideDate >= thisYearStart) thisYearEarnings += fare;
+        });
+
+        res.status(200).json({
+            lifetimeEarnings: totalEarnings,
+            totalRides: totalRides,
+            averageRating: req.captain.averageRating || 0,
+            chartData: [
+                { name: 'Last 7 Days', earnings: last7DaysEarnings },
+                { name: 'This Month', earnings: thisMonthEarnings },
+                { name: 'This Year', earnings: thisYearEarnings }
+            ]
+        });
+    } catch (err) {
+        console.error("Error fetching captain analytics:", err);
+        res.status(500).json({ message: 'Failed to fetch analytics' });
+    }
+};
+
+
 

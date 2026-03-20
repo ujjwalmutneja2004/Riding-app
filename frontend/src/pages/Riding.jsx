@@ -95,6 +95,10 @@ import {
 import { SocketContext } from "../context/SocketContext";
 import LiveTracking from "../components/LiveTracking";
 import logo from "../assets/logoo.png";
+import RateCaptainPanel from "../components/RateCaptainPanel";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { useRef } from "react";
 
 // Load Stripe public key from Vite env variable
 const stripePromise = loadStripe(import.meta.env.VITE_PUBLISH);
@@ -190,10 +194,13 @@ const Riding = () => {
 
   // Listen for ride-end event and redirect
   const [paymentMode, setPaymentMode] = useState(null); 
+  const [showRatingPanel, setShowRatingPanel] = useState(false);
+  const ratingPanelRef = useRef(null);
+
   useEffect(() => {
     if (socket) {
       socket.on("ride-ended", () => {
-        navigate("/home");
+        setShowRatingPanel(true);
       });
     }
 
@@ -201,7 +208,19 @@ const Riding = () => {
     return () => {
       if (socket) socket.off("ride-ended");
     };
-  }, [socket, navigate]);
+  }, [socket]);
+
+  useGSAP(() => {
+    if (showRatingPanel) {
+      gsap.to(ratingPanelRef.current, { transform: 'translateY(0)' });
+    } else {
+      gsap.to(ratingPanelRef.current, { transform: 'translateY(100%)' });
+    }
+  }, [showRatingPanel]);
+
+  const handleFinishRide = () => {
+    navigate("/home");
+  };
 
   if (!ride) return <p className="p-4">No ride data available.</p>;
 
@@ -301,6 +320,18 @@ const Riding = () => {
             Confirm Cash Payment
           </button>
         )}
+      </div>
+
+       {/* Rating Panel */}
+      <div 
+        ref={ratingPanelRef} 
+        className="fixed w-full z-20 bottom-0 translate-y-full bg-white px-3 py-10 pt-12 rounded-t-3xl shadow-2xl border-t-2"
+      >
+         <RateCaptainPanel 
+            ride={ride} 
+            onSkip={handleFinishRide} 
+            onSubmit={handleFinishRide} 
+         />
       </div>
     </div>
   );
