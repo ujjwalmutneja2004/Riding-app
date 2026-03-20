@@ -33,6 +33,8 @@ const CaptainLogin = ({ resetPanelOpen, setResetPanelOpen }) => {
         withCredentials: true, // Ensure cookies are sent if required for authentication
       });
 
+     console.log("Final URL:", `${import.meta.env.VITE_BASE_URL}/captains/login`);
+
       console.log('response', response);
 
       if (response.status === 200) {
