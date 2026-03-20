@@ -26,7 +26,9 @@ router.post('/login',[
   captainController.loginCaptain
 )
 
-
+router.post('/forgot-password', captainController.forgotPassword);
+router.post('/verify-otp', captainController.verifyOtp);
+router.post('/reset-password', captainController.resetPassword);
 
 router.get('/profile' ,authMiddleware.authCaptain,captainController.getCaptainProfile)
 

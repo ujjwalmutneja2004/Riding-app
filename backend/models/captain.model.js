@@ -88,6 +88,10 @@ const captainSchema=new mongoose.Schema({
         }
     }
 )
+captainSchema.add({
+    resetOtp: { type: String, select: false },
+    resetOtpExpire: { type: Date }
+});
 
 ///////////methods are used when you want to call on whole model  
 captainSchema.methods.generateAuthToken=function(){

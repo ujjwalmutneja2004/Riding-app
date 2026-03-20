@@ -21,6 +21,11 @@ router.post('/login',[
  userController.loginUser
 )
 
+router.post('/forgot-password', userController.forgotPassword);
+router.post('/verify-otp', userController.verifyOtp);
+router.post('/reset-password', userController.resetPassword);
+
+
 
 router.get('/profile',authMiddleware.authUser,userController.getUserProfile)
 

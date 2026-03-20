@@ -154,6 +154,35 @@ module.exports.logoutCaptain = async (req, res, next) => {
         res.status(500).json({ message: 'Something went wrong' });
     }
 };
+module.exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        await captainService.requestPasswordReset(email);
+        res.status(200).json({ message: 'If the email exists, an OTP has been sent' });
+    } catch (err) {
+        res.status(200).json({ message: 'If the email exists, an OTP has been sent' });
+    }
+};
+
+module.exports.verifyOtp = async (req, res) => {
+    const { email, otp } = req.body;
+    try {
+        await captainService.verifyOtp(email, otp);
+        res.status(200).json({ ok: true });
+    } catch (err) {
+        res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+};
+
+module.exports.resetPassword = async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    try {
+        await captainService.resetPassword(email, otp, newPassword);
+        res.status(200).json({ ok: true });
+    } catch (err) {
+        res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+};
 
 
 module.exports.getCaptainHistory = async (req, res, next) => {
