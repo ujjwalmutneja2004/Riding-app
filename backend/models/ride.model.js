@@ -28,6 +28,16 @@ const rideSchema=new mongoose.Schema({
         enum:['pending','accepted','completed','cancelled'],
         default:'pending'
     },
+    rideMode: {
+        type: String,
+        enum: ['Work Mode', 'Chill Mode', 'Urgent Mode'],
+        default: 'Chill Mode'
+    },
+    rating: {
+        type: Number,
+        min: 1,
+        max: 5
+    },
     //in seconds
     duration:{
         type:Number,

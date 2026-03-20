@@ -20,7 +20,7 @@ module.exports.createRide = async (req, res) => {
 
 
 
-    const { userId, pickup, destination, vehicleType } = req.body;
+    const { userId, pickup, destination, vehicleType, rideMode } = req.body;
     const destCoordinates = await mapServices.getAddressCoordinate(destination);
     const pickupcoordinates=await mapServices.getAddressCoordinate(pickup);
 
@@ -32,6 +32,7 @@ module.exports.createRide = async (req, res) => {
             pickup,
             destination,
             vehicleType,
+            rideMode: rideMode || 'Chill Mode',
              paymentMode: "cash",
             paymentStatus: "pending",
             destLat: destCoordinates.lat,
@@ -215,6 +216,51 @@ module.exports.endRide=async(req,res)=>{
 
 }
 
+
+module.exports.rateRide = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+    const { rating } = req.body;
+
+    try {
+        const ride = await rideModel.findOne({ _id: id, user: req.user._id });
+        if (!ride) {
+            return res.status(404).json({ message: 'Ride not found' });
+        }
+        if (ride.status !== 'completed') {
+            return res.status(400).json({ message: 'Can only rate completed rides' });
+        }
+        if (ride.rating) {
+            return res.status(400).json({ message: 'Ride already rated' });
+        }
+
+        ride.rating = rating;
+        await ride.save();
+
+        const captainModel = require('../models/captain.model');
+        const captain = await captainModel.findById(ride.captain);
+        
+        if (captain) {
+            captain.ratings.push({ user: req.user._id, score: rating });
+            
+            // Recalculate average
+            const sum = captain.ratings.reduce((acc, curr) => acc + curr.score, 0);
+            captain.averageRating = sum / captain.ratings.length;
+            
+            await captain.save();
+        }
+
+        return res.status(200).json({ message: 'Rating submitted successfully', ride });
+
+    } catch (error) {
+        console.error("🔥 ERROR in Rate Ride Controller:", error);
+        return res.status(500).json({ message: error.message });
+    }
+};
 
 module.exports.getCaptainEarnings = async (req, res) => {
     const { captainId } = req.params;

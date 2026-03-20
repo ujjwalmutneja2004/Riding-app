@@ -29,6 +29,8 @@ router.post('/reset-password', userController.resetPassword);
 
 router.get('/profile',authMiddleware.authUser,userController.getUserProfile)
 
+router.get('/history', authMiddleware.authUser, userController.getUserHistory)
+
 router.get('/logoutu',authMiddleware.authUser,userController.logoutUser)
 
 module.exports=router;

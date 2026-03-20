@@ -9,7 +9,7 @@ const vehicleImages = {
 };
 
 
-const ConfirmRide = ({ fare,vehicleType,pickup,destination ,createRide, setVehicleFound, setConfirmRidePanel }) => {
+const ConfirmRide = ({ fare,vehicleType,pickup,destination, rideMode, createRide, setVehicleFound, setConfirmRidePanel }) => {
   return (
     <div>
 
@@ -24,6 +24,14 @@ const ConfirmRide = ({ fare,vehicleType,pickup,destination ,createRide, setVehic
       {/* <img  className='h-20' src="https://www.pngplay.com/wp-content/uploads/8/Uber-PNG-Photos.png" alt=""/> */}
        <img  className='h-20' src={vehicleImages[vehicleType]} alt=""/>
       <div className='w-full mt-5'>
+           <div className='flex items-center gap-5 p-3 border-b-2'>
+             <i className="ri-steering-2-fill text-xl"></i>
+             <div>
+              <h3 className='text-lg font-medium'>{rideMode || 'Chill Mode'}</h3>
+              <p className='text-sm mt-1 text-gray-600'>Selected Ride Purpose</p>
+             </div>
+           </div>
+
            <div className='flex items-center gap-5 p-3 border-b-2'>
            <i className="ri-map-pin-user-fill"></i>
            <div >

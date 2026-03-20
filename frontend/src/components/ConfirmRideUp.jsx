@@ -134,6 +134,21 @@ const ConfirmRidePopUp = (props) => {
 
         <h5 className="text-lg font-semiibold mr-2" >{distance ? `${distance}` : 'Calculating...'}</h5>
       </div>
+
+      {props.ride?.rideMode && (
+        <div className="bg-gray-100 p-3 rounded-lg mt-4 border-l-4 border-black flex items-center gap-3">
+          <i className="ri-steering-2-fill text-xl"></i>
+          <div>
+            <h4 className="font-semibold text-md">{props.ride.rideMode}</h4>
+            <p className="text-xs text-gray-600">
+              {props.ride.rideMode === 'Work Mode' ? 'Silent ride, shortest route.' : 
+               props.ride.rideMode === 'Chill Mode' ? 'Music allowed, casual conversation.' : 
+               props.ride.rideMode === 'Urgent Mode' ? 'Fastest route, priority driver.' : ''}
+            </p>
+          </div>
+        </div>
+      )}
+
       <button
   onClick={calculateDistance}
   className="px-4 py-2 mt-4 text-sm to-blue-800 text-black font-medium rounded-full shadow-md hover:bg-yellow-600 transition duration-300 ml-auto"

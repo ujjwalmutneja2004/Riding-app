@@ -11,6 +11,7 @@ router.post('/create',
     body('pickup').isString().isLength({min:3}).withMessage('Invalid pickup address'),
     body('destination').isString().isLength({min:3}).withMessage('Invalid drop address'),
     body('vehicleType').isString().isIn(['auto','car','motorcycle']).withMessage('Invalid vehicle type'),
+    body('rideMode').optional().isString().isIn(['Work Mode', 'Chill Mode', 'Urgent Mode']).withMessage('Invalid ride mode'),
     rideController.createRide
 
 );
@@ -41,6 +42,12 @@ router.post('/end-ride',
     rideController.endRide
 
 )
+
+router.post('/:id/rate',
+    authMiddleware.authUser,
+    body('rating').isNumeric().isInt({ min: 1, max: 5 }).withMessage('Rating must be an integer between 1 and 5'),
+    rideController.rateRide
+);
 
 router.get('/:captainId/earnings',getCaptainEarnings);
 

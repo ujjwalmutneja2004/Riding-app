@@ -390,23 +390,37 @@ const CaptainRiding = () => {
     <p>Loading map...</p>
   </div>
 )}
-
       <div
-        className="h-1/5 p-6 flex items-center justify-between bg-yellow-400"
-        onClick={() => setFinishRidePanel(true)}
+        className="h-1/5 p-6 flex flex-col justify-center bg-yellow-400 relative"
       >
-        <h5 className="text-lg font-bold mr-2">
-          {distance ? `${distance} KM ` : "Calculating..."}
-        </h5>
-        <button
-          onClick={() => calculateDistance(currentLocation)}
-           className="absolute top-4 right-4 px-4 py-2 text-sm bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition duration-300 z-10"
-        >
-          Get Distance
-        </button>
-        <button className="bg-green-600 text-white font-semibold p-3 px-10 rounded-lg">
-          Complete Ride
-        </button>
+        <div className="flex items-center justify-between w-full h-full">
+          <div className="flex flex-col">
+            <h5 className="text-lg font-bold mr-2">
+              {distance ? `${distance} KM ` : "Calculating..."}
+            </h5>
+            {ride?.rideMode && (
+              <div className="mt-1 flex items-center gap-1 font-semibold text-sm">
+                <i className="ri-steering-2-fill"></i>
+                {ride.rideMode}
+              </div>
+            )}
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => calculateDistance(currentLocation)}
+              className="px-4 py-2 text-sm bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition duration-300"
+            >
+              Get Distance
+            </button>
+            <button 
+              onClick={() => setFinishRidePanel(true)}
+              className="bg-green-600 text-white font-semibold p-3 px-8 rounded-lg shadow-md hover:bg-green-700 transition duration-300"
+            >
+              Complete Ride
+            </button>
+          </div>
+        </div>
       </div>
 
       <div

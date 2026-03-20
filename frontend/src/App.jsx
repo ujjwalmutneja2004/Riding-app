@@ -15,6 +15,9 @@ import Riding from "./pages/Riding";
 import CaptainRiding from "./pages/CaptainRiding";
 import SetToken from "./pages/Set-token";
 
+import UserRideHistory from "./pages/UserRideHistory";
+import CaptainDashboard from "./pages/CaptainDashboard";
+import CaptainRideHistory from "./pages/CaptainRideHistory";
 
 const App = () => {
   return (
@@ -56,7 +59,25 @@ const App = () => {
           </CaptainProtectWrapper>
         } />
 
-    <Route path="/Captain-riding" element={<CaptainRiding />} />
+    <Route path="/Captain-riding" element={<CaptainRiding />} />
+
+        <Route path='/user/history' element={
+          <UserProtectWrapper>
+            <UserRideHistory />
+          </UserProtectWrapper>
+        } />
+
+        <Route path='/captain-dashboard' element={
+          <CaptainProtectWrapper>
+            <CaptainDashboard />
+          </CaptainProtectWrapper>
+        } />
+
+        <Route path='/captain-history' element={
+          <CaptainProtectWrapper>
+            <CaptainRideHistory />
+          </CaptainProtectWrapper>
+        } />
 
       </Routes>
     </div>

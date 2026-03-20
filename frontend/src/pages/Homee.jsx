@@ -8,6 +8,7 @@ import gsap from "gsap";
 import "remixicon/fonts/remixicon.css";
 import Locationsearchpanel from "../components/Locationsearchpanel";
 import VehiclePanel from "../components/VehiclePanel";
+import RideModePanel from "../components/RideModePanel";
 import ConfirmRide from "../components/ConfirmRide";
 import LookingForDriver from "../components/LookingForDriver";
 import WaitingForDriver from "../components/WaitingForDriver";
@@ -23,6 +24,8 @@ const Homee = () => {
   const [panelOpen, setPanelOpen] = useState(null);
   const [vehiclePanel, setVehiclePanel] = useState(false);
   const [confirmRidePanel, setConfirmPanel] = useState(false);
+  const [rideModePanelOpen, setRideModePanelOpen] = useState(false);
+  const [rideMode, setRideMode] = useState('Chill Mode');
   const [vehicleFound, setVehicleFound] = useState(false);
   const [isWaitingForDriver, setWaitingForDriver] = useState(false);
   const[vehicleType,setVehicleType]=useState(null)
@@ -33,6 +36,7 @@ const Homee = () => {
   const vehiclePanelRef = useRef(null);
   const vehicleClosedPanelRef = useRef(null);
   const confirmRidePanelRef = useRef(null);
+  const rideModePanelRef = useRef(null);
   const panelRef = useRef(null);
   const WaitingForDriverRef = useRef(null);
   const panelCloseRef = useRef(null);
@@ -93,6 +97,10 @@ const [fare,setFare]=useState({})
   useGSAP(() => {
     gsap.to(confirmRidePanelRef.current, { y: confirmRidePanel ? 0 : "100%" });
   }, [confirmRidePanel]);
+
+  useGSAP(() => {
+    gsap.to(rideModePanelRef.current, { y: rideModePanelOpen ? 0 : "100%" });
+  }, [rideModePanelOpen]);
 
   useGSAP(() => {
     gsap.to(vehicleFoundRef.current, { transform: vehicleFound ? "translateY(0)" : "translateY(150%)" });
@@ -195,7 +203,8 @@ async function createRide() {
     {
       pickup,             // ✅ Payload
       destination,
-      vehicleType
+      vehicleType,
+      rideMode
     },
     {
       headers: {
@@ -216,6 +225,13 @@ async function createRide() {
     alt="logo"
      />
     )}
+      <button
+        onClick={() => navigate('/user/history')}
+        className="absolute right-20 top-5 bg-white h-10 w-10 flex items-center justify-center rounded-full shadow-md z-50"
+      >
+        <i className="text-lg font-medium ri-history-line"></i>
+      </button>
+
       <button
         onClick={handleLogout}
         className="absolute right-5 top-5 bg-white h-10 w-10 flex items-center justify-center rounded-full shadow-md z-50"
@@ -323,11 +339,23 @@ async function createRide() {
         <VehiclePanel
           fare={fare}
            selectVehicle={setVehicleType}
-          setConfirmRidePanel={setConfirmPanel}
+          setRideModePanelOpen={setRideModePanelOpen}
           setVehiclePanel={setVehiclePanel}
         />
       </div>
 
+     {/* Ride Mode Panel */}
+      <div
+        ref={rideModePanelRef}
+        className="fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12"
+      >
+        <RideModePanel
+          rideMode={rideMode}
+          setRideMode={setRideMode}
+          setRideModePanelOpen={setRideModePanelOpen}
+          setConfirmRidePanel={setConfirmPanel}
+        />
+      </div>
 
 
     {/* Confirm Ride Panel */}
@@ -341,6 +369,7 @@ async function createRide() {
          destination={destination}
          fare={fare}
           vehicleType={vehicleType}
+          rideMode={rideMode}
           setConfirmRidePanel={setConfirmPanel}
           setVehicleFound={setVehicleFound}
         />
