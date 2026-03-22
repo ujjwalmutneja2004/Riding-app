@@ -125,7 +125,7 @@ const getColor = (name) => {
 
 
   return (
-    <div>
+   <div className="h-[80vh] overflow-y-auto px-3 pb-24">
       <h5
         className="p-1 text-center w-[93%] absolute top-0"
         onClick={() => props.setConfirmRidePopupPanel(false)}
