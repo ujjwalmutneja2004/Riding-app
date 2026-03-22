@@ -158,19 +158,23 @@ const getColor = (name) => {
 
 </div>
 
-      {props.ride?.rideMode && (
-        <div className="bg-gray-100 p-3 rounded-lg mt-4 border-l-4 border-black flex items-center gap-3">
-          <i className="ri-steering-2-fill text-xl"></i>
-          <div>
-            <h4 className="font-semibold text-md">{props.ride.rideMode}</h4>
-            <p className="text-xs text-gray-600">
-              {props.ride.rideMode === 'Work Mode' ? 'Silent ride, shortest route.' : 
-               props.ride.rideMode === 'Chill Mode' ? 'Music allowed, casual conversation.' : 
-               props.ride.rideMode === 'Urgent Mode' ? 'Fastest route, priority driver.' : ''}
-            </p>
-          </div>
-        </div>
-      )}
+  {props.ride?.rideMode && (
+  <div className="bg-gray-100 px-3 py-2 rounded-md mt-2 flex items-center gap-2">
+    <i className="ri-steering-2-fill text-base"></i>
+    
+    <div className="flex items-center gap-2">
+      <h4 className="font-medium text-sm">
+        {props.ride.rideMode}
+      </h4>
+
+      <span className="text-xs text-gray-500">
+        {props.ride.rideMode === 'Work Mode' ? 'Silent ride' : 
+         props.ride.rideMode === 'Chill Mode' ? 'Music & talk' : 
+         props.ride.rideMode === 'Urgent Mode' ? 'Fastest route' : ''}
+      </span>
+    </div>
+  </div>
+)}
 
       <button
   onClick={calculateDistance}
