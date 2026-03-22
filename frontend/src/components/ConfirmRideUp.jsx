@@ -109,6 +109,19 @@ const ConfirmRidePopUp = (props) => {
     }
   };
 
+  const getInitials = (user) => {
+  const first = user?.fullname?.firstname?.[0] || "";
+  const last = user?.fullname?.lastname?.[0] || "";
+  return (first + last).toUpperCase();
+};
+
+const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-purple-500"];
+
+const getColor = (name) => {
+  if (!name) return "bg-gray-400";
+  const index = name.charCodeAt(0) % colors.length;
+  return colors[index];
+};
 
 
   return (
@@ -122,18 +135,28 @@ const ConfirmRidePopUp = (props) => {
 
       <h3 className="text-2xl font-semibold mb-5">Confirm This ride to Start</h3>
 
-      <div className="flex items-center justify-between bg-yellow-300 rounded-lg mt-4">
-        <div className="flex items-center gap-3 ">
-          <img
-            className="h-10 w-10 rounded-full mt-2 mb-2 ml-2 object-cover"
-            src="https://toppng.com/uploads/preview/stock-person-png-stock-photo-man-11563049686zqeb9zmqjd.png"
-          ></img>
-          <h2 className="text-lg font-medium capitalize">{props.ride?.user.fullname.firstname}</h2>
-        </div>
-       
+   <div className="flex items-center justify-between bg-yellow-300 rounded-lg mt-4 p-3">
+  
+  <div className="flex items-center gap-3">
+  
+    <div
+      className={`h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold ${getColor(
+        props.ride?.user?.fullname?.firstname
+      )}`}
+    >
+      {getInitials(props.ride?.user)}
+    </div>
 
-        <h5 className="text-lg font-semiibold mr-2" >{distance ? `${distance}` : 'Calculating...'}</h5>
-      </div>
+    <h2 className="text-lg font-medium capitalize">
+      {props.ride?.user?.fullname?.firstname}
+    </h2>
+  </div>
+
+  <h5 className="text-lg font-semibold">
+    {distance ? `${distance}` : "Calculating..."}
+  </h5>
+
+</div>
 
       {props.ride?.rideMode && (
         <div className="bg-gray-100 p-3 rounded-lg mt-4 border-l-4 border-black flex items-center gap-3">
