@@ -85,12 +85,20 @@ const FinishRide = (props) => {
 
 
   }
+  const getInitials = (user) => {
+  const first = user?.fullname?.firstname?.[0] || "";
+  const last = user?.fullname?.lastname?.[0] || "";
+  return (first + last).toUpperCase();
+};
+
+const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-purple-500"];
+
+const getColor = (name) => {
+  if (!name) return "bg-gray-400";
+  const index = name.charCodeAt(0) % colors.length;
+  return colors[index];
+};
       
-
-
-
-
-    
     // useEffect(() => {
     //   calculateDistance();
     //   const interval = setInterval(calculateDistance,100000); // Update every 10 seconds
@@ -117,19 +125,28 @@ const FinishRide = (props) => {
 
             <h3 className="text-2xl font-semibold mb-5">Finish this Ride</h3>
 
-            <div className="flex items-center justify-between p-4 border-2 bg-yellow-300 rounded-lg mt-4">
-                <div className="flex items-center gap-3 ">
-                    <img
-                        className="h-10 w-10 rounded-full mt-2 mb-2 ml-2 object-cover"
-                        src="https://toppng.com/uploads/preview/stock-person-png-stock-photo-man-11563049686zqeb9zmqjd.png"
-                    ></img>
-                    <h2 className="text-lg font-medium capitalize">{props.ride?.user.fullname.firstname}</h2>
-                </div>
+     <div className="flex items-center justify-between p-4 border-2 bg-yellow-300 rounded-lg mt-4">
+      
+      <div className="flex items-center gap-3">
+        
+        <div
+          className={`h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold ${getColor(
+            props.ride?.user?.fullname?.firstname
+          )}`}
+        >
+          {getInitials(props.ride?.user)}
+        </div>
 
-                <h5 className="text-lg font-semibold mr-2">
-                {distance ? `${distance}` : 'Calculating...'}
-        </h5>
-            </div>
+        <h2 className="text-lg font-medium capitalize">
+          {props.ride?.user?.fullname?.firstname}
+        </h2>
+      </div>
+
+      <h5 className="text-lg font-semibold">
+        {distance ? `${distance}` : "Calculating..."}
+      </h5>
+    </div>
+
 
             <div className="flex flex-col gap-2 items-center justify-between">
                 <div className="w-full mt-5">
