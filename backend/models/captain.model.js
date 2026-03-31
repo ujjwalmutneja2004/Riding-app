@@ -32,8 +32,22 @@ const captainSchema=new mongoose.Schema({
     },
     status:{
         type:String,
-        enum:['active','inactive'],
-        default:'inactive',
+        enum:['pending','approved','rejected','active','inactive'],
+        default:'pending',
+    },
+    isAvailable: {
+        type: Boolean,
+        default: false,
+    },
+    documents: {
+        licenseFront: { type: String },
+        licenseBack: { type: String },
+        selfie: { type: String },
+        numberPlate: { type: String },
+        rc: { type: String }
+    },
+    rejectionReason: {
+        type: String,
     },
     vehicle:{
         color:{

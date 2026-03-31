@@ -1,21 +1,24 @@
 import React, { useContext, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CaptainDataContext } from '../context/CaptainContext';
-import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { ToastContainer, toast } from 'react-toastify'; // ✅ Toast Import
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // ✅ Eye Icon Import
+import { FaEye, FaEyeSlash, FaCloudUploadAlt, FaCheckCircle, FaTrash } from 'react-icons/fa';
 import logo from '../assets/logoo.png';
 
 const CaptainSignup = () => {
   const navigate = useNavigate();
   const { setCaptain } = useContext(CaptainDataContext);
 
-  // State variables
+  // Form Steps
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  // Step 1 States
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // ✅ Password Toggle
+  const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [vehicleColor, setVehicleColor] = useState("");
@@ -23,238 +26,211 @@ const CaptainSignup = () => {
   const [vehicleCapacity, setVehicleCapacity] = useState("");
   const [vehicleType, setVehicleType] = useState("");
 
+  // Step 2 States (Files)
+  const [files, setFiles] = useState({
+    licenseFront: null,
+    licenseBack: null,
+    selfie: null,
+    numberPlate: null,
+    rc: null
+  });
+
+  const [previews, setPreviews] = useState({
+    licenseFront: null,
+    licenseBack: null,
+    selfie: null,
+    numberPlate: null,
+    rc: null
+  });
+
+  const handleFileChange = (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFiles(prev => ({ ...prev, [type]: file }));
+      setPreviews(prev => ({ ...prev, [type]: URL.createObjectURL(file) }));
+    }
+  };
+
+  const removeFile = (type) => {
+    setFiles(prev => ({ ...prev, [type]: null }));
+    setPreviews(prev => ({ ...prev, [type]: null }));
+  };
+
   const submitHandler = async (e) => {
     e.preventDefault();
+    
+    // Check if all files are selected in step 2
+    const missingDocs = Object.keys(files).filter(key => !files[key]);
+    if (missingDocs.length > 0) {
+      toast.error("Please upload all verification documents! ❌");
+      return;
+    }
 
-    const captainData = {
-      fullname: { firstname: firstName, lastname: lastName },
-      email,
-      password,
-      vehicle: {
-        color: vehicleColor,
-        plate: vehiclePlate,
-        capacity: Number(vehicleCapacity), // ✅ Ensure it's a number
-        vehicleType,
-      },
-    };
+    setLoading(true);
+    const formData = new FormData();
+    
+    // Nesting for express-validator
+    formData.append('fullname[firstname]', firstName);
+    formData.append('fullname[lastname]', lastName);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('vehicle[color]', vehicleColor);
+    formData.append('vehicle[plate]', vehiclePlate);
+    formData.append('vehicle[capacity]', vehicleCapacity);
+    formData.append('vehicle[vehicleType]', vehicleType);
 
-    console.log("Submitting Captain Data:", captainData);
+    // Append Files
+    Object.keys(files).forEach(key => {
+      formData.append(key, files[key]);
+    });
 
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/captains/register`,
-        captainData
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
-      console.log("Success:", response.data);
       if (response.status === 201) {
-        const data = response.data;
-        setCaptain(data.captain);
-        localStorage.setItem("token", data.token);
-        toast.success("Captain Account Created Successfully! ✅"); // ✅ Toast Success
-        setTimeout(() => navigate("/captain-home"), 2000); // ✅ Navigate after 2 sec
+        setCaptain(response.data.captain);
+        localStorage.setItem("token", response.data.token);
+        toast.success("Account Created! Vetting in progress... ⏳");
+        setTimeout(() => navigate("/captain-status"), 2000);
       }
-
-      // Reset form fields
-      setEmail(""); setFirstName(""); setLastName(""); setPassword("");
-      setVehicleColor(""); setVehiclePlate(""); setVehicleCapacity(""); setVehicleType("");
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Something went wrong! ❌"); // ✅ Toast Error
+      toast.error(error.response?.data?.message || "Upload failed. Try again! ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-   <div className="min-h-screen bg-gray-50 flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
-      <ToastContainer position="top-right" autoClose={3000} />
+    <div className="min-h-screen bg-[#fbf8fd] flex flex-col items-center py-12 px-4 font-['Inter']">
+      <ToastContainer position="top-center" autoClose={3000} />
+      
+      <img className="h-10 mb-8 sm:h-12" src={logo} alt="Logo" />
 
-      <div className="w-full max-w-5xl xl:max-w-6xl">
-        {/* Smaller logo */}
-        <div className="text-center mb-5">
-          <img
-            className="mx-auto h-10 w-auto sm:h-12 object-contain"
-            src={logo}
-            alt="TravelX Logo"
-          />
+      {/* Progress Stepper */}
+      <div className="w-full max-w-lg mb-10 flex items-center justify-center gap-4">
+        <div className={`flex items-center gap-2 ${step === 1 ? 'text-[#010102]' : 'text-gray-400'}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === 1 ? 'bg-[#010102] text-white shadow-lg' : 'bg-gray-200'}`}>1</div>
+          <span className="text-sm font-bold">Details</span>
         </div>
+        <div className="w-12 h-0.5 bg-gray-200"></div>
+        <div className={`flex items-center gap-2 ${step === 2 ? 'text-[#010102]' : 'text-gray-400'}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${step === 2 ? 'bg-[#010102] text-white shadow-lg' : 'bg-gray-200'}`}>2</div>
+          <span className="text-sm font-bold">Verification</span>
+        </div>
+      </div>
 
-        <div className="bg-white py-6 px-6 sm:px-8 lg:px-10 shadow-xl rounded-2xl border border-gray-200">
-          <form onSubmit={submitHandler} className="space-y-5">
-            {/* Name fields - 2 columns */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  First name
-                </label>
-                <input
-                  required
-                  type="text"
-                  placeholder="First name"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Last name
-                </label>
-                <input
-                  required
-                  type="text"
-                  placeholder="Last name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
-                />
-              </div>
+      <div className="w-full max-w-3xl bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-[0_20px_100px_rgba(0,0,0,0.03)] border border-[#efedf2]">
+        {step === 1 ? (
+          <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setStep(2); }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input label="First Name" value={firstName} onChange={setFirstName} placeholder="John" />
+              <Input label="Last Name" value={lastName} onChange={setLastName} placeholder="Doe" />
             </div>
 
-            {/* Email + Password - side by side */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Email address
-                </label>
-                <input
-                  required
-                  type="email"
-                  placeholder="email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Password
-                </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input label="Email address" type="email" value={email} onChange={setEmail} placeholder="john@example.com" />
+              <div className="relative">
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Password</label>
                 <div className="relative">
-                  <input
-                    required
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <FaEyeSlash size={18} />
-                    ) : (
-                      <FaEye size={18} />
-                    )}
+                  <input required type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-xl border border-[#efedf2] bg-[#fbf8fd] px-5 py-3.5 text-sm outline-none focus:border-[#010102] transition-all" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black">
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Vehicle info - 4 columns on wide screens */}
-            <div className="pt-3">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                Vehicle Information
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="pt-4">
+              <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[#7b5900] mb-6">Fleet Information</h3>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <Input label="Color" value={vehicleColor} onChange={setVehicleColor} placeholder="Black" />
+                <Input label="Plate" value={vehiclePlate} onChange={setVehiclePlate} placeholder="PB10..." />
+                <Input label="Capacity" type="number" value={vehicleCapacity} onChange={setVehicleCapacity} placeholder="4" />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Color
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    placeholder="Vehicle color"
-                    value={vehicleColor}
-                    onChange={(e) => setVehicleColor(e.target.value)}
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Plate
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    placeholder="e.g. PB10AB1234"
-                    value={vehiclePlate}
-                    onChange={(e) => setVehiclePlate(e.target.value)}
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Capacity
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    placeholder="Persons"
-                    value={vehicleCapacity}
-                    onChange={(e) => setVehicleCapacity(e.target.value)}
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base placeholder:text-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Type
-                  </label>
-                  <select
-                    required
-                    value={vehicleType}
-                    onChange={(e) => setVehicleType(e.target.value)}
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-base text-gray-700 focus:border-black focus:ring-1 focus:ring-black transition-all outline-none"
-                  >
-                    <option value="" disabled>
-                      Select type
-                    </option>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Type</label>
+                  <select required value={vehicleType} onChange={(e) => setVehicleType(e.target.value)} className="w-full rounded-xl border border-[#efedf2] bg-[#fbf8fd] px-5 py-3.5 text-sm font-medium outline-none focus:border-[#010102] transition-all appearance-none cursor-pointer">
+                    <option value="" disabled>Select</option>
                     <option value="car">Car</option>
                     <option value="auto">Auto</option>
-                    <option value="motorcycle">Motorcycle</option>
+                    <option value="motorcycle">Bike</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* Button & link */}
-            <div className="pt-5 flex justify-center">
-              <div className="flex-row items-center gap-6 sm:gap-10">
-                <button
-                  type="submit"
-                  className="bg-black text-white font-semibold py-3 px-8 rounded-lg text-base hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all shadow-md min-w-[220px] sm:min-w-[260px]"
-                >
-                  Create Captain Account
-                </button>
+            <button type="submit" className="w-full py-4 mt-8 bg-[#010102] text-white rounded-2xl font-bold shadow-xl hover:scale-[1.01] transition-all">
+              Continue to Verification
+            </button>
+          </form>
+        ) : (
+          <form className="space-y-10" onSubmit={submitHandler}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <UploadCard label="License (Front)" type="licenseFront" preview={previews.licenseFront} onChange={handleFileChange} onRemove={removeFile} />
+              <UploadCard label="License (Back)" type="licenseBack" preview={previews.licenseBack} onChange={handleFileChange} onRemove={removeFile} />
+              <UploadCard label="Vehicle RC" type="rc" preview={previews.rc} onChange={handleFileChange} onRemove={removeFile} />
+              <UploadCard label="Number Plate" type="numberPlate" preview={previews.numberPlate} onChange={handleFileChange} onRemove={removeFile} />
+              <UploadCard label="Driver Selfie" type="selfie" preview={previews.selfie} onChange={handleFileChange} onRemove={removeFile} full />
+            </div>
 
-                <p className="text-sm text-gray-600 whitespace-nowrap mt-4 text-center">
-                  Already have an account?{" "}
-                  <Link
-                    to="/captain-login"
-                    className="font-medium text-indigo-600 hover:text-indigo-500"
-                  >
-                    Login here
-                  </Link>
-                </p>
-              </div>
+            <div className="flex gap-4 pt-10 border-t border-[#efedf2]">
+              <button type="button" onClick={() => setStep(1)} className="flex-1 py-4 text-gray-400 font-bold hover:text-black transition-all">Back to Details</button>
+              <button disabled={loading} type="submit" className="flex-[2] py-4 bg-[#010102] text-white rounded-2xl font-bold shadow-xl flex items-center justify-center gap-3 hover:scale-[1.01] disabled:opacity-50 transition-all">
+                {loading ? <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" /> : "Verify and Create Account"}
+              </button>
             </div>
           </form>
+        )}
 
-          <p className="mt-6 text-center text-xs text-gray-500">
-            This site is protected by reCAPTCHA and the Google Privacy Policy
-            and Terms of Service apply.
+        <div className="mt-12 pt-8 border-t border-[#efedf2] text-center">
+          <p className="text-sm text-gray-500">
+            By creating an account, you agree to our 
+            <span className="text-[#010102] font-bold mx-1">Privacy Policy</span> and 
+            <span className="text-[#010102] font-bold mx-1">Operator Guidelines.</span>
           </p>
+          <p className="mt-4 text-sm font-medium">Already registered? <Link to="/captain-login" className="text-[#7b5900] underline font-bold">Access Dashboard</Link></p>
         </div>
       </div>
     </div>
-  );
+  )
 };
+
+const Input = ({ label, value, onChange, placeholder, type = "text" }) => (
+  <div>
+    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{label}</label>
+    <input required type={type} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-xl border border-[#efedf2] bg-[#fbf8fd] px-5 py-3.5 text-sm outline-none focus:border-[#010102] transition-all" />
+  </div>
+);
+
+const UploadCard = ({ label, type, preview, onChange, onRemove, full }) => (
+  <div className={`${full ? 'md:col-span-2' : ''} space-y-3`}>
+    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</label>
+    <div className="relative h-40 group cursor-pointer">
+      {!preview ? (
+        <div className="h-full w-full border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center gap-2 group-hover:border-[#7b5900] group-hover:bg-[#fbf8fd] transition-all cursor-pointer relative overflow-hidden">
+          <input required type="file" accept="image/*" onChange={(e) => onChange(e, type)} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+          <FaCloudUploadAlt className="text-3xl text-gray-300 group-hover:text-[#7b5900] transition-all" />
+          <span className="text-xs font-bold text-gray-400 group-hover:text-[#010102]">Tap to Upload</span>
+        </div>
+      ) : (
+        <div className="h-full w-full rounded-2xl overflow-hidden relative shadow-lg">
+          <img src={preview} alt="Preview" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <button type="button" onClick={() => onRemove(type)} className="w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+              <FaTrash />
+            </button>
+          </div>
+          <div className="absolute top-3 right-3 bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg">
+            <FaCheckCircle size={12} />
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+);
 
 export default CaptainSignup;

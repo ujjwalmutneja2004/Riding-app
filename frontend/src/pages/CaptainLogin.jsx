@@ -43,7 +43,12 @@ const CaptainLogin = ({ resetPanelOpen, setResetPanelOpen }) => {
           position: 'top-right',
           autoClose: 1000,
         });
-        navigate('/captain-home');
+        
+        if (data.captain.status === 'approved') {
+          navigate('/captain-home');
+        } else {
+          navigate('/captain-status');
+        }
       }
     } catch (error) {
       toast.error('❌ Login failed. Check your credentials!', {
@@ -160,6 +165,16 @@ const CaptainLogin = ({ resetPanelOpen, setResetPanelOpen }) => {
               className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
             >
               Sign in as User
+            </Link>
+          </div>
+
+          {/* Sign in as Admin */}
+          <div className="mt-4">
+            <Link
+              to="/admin/login"
+              className="w-full flex items-center justify-center py-3 px-4 border border-black rounded-lg shadow-sm text-base font-medium text-black bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors"
+            >
+              Sign in as Admin
             </Link>
           </div>
         </div>

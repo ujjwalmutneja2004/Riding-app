@@ -60,14 +60,14 @@ const CaptainDetails = () => {
             <div className='flex p-3 mt-8 bg-gray-100 rounded-xl justify-center gap-5 items-start'>
 
               <div className='text-center'>
-              <i className="text-2xl front-thin ri-time-line"></i>
-              <h5 className='text-lg font-medium'>{Math.round(earnings.totaldistance)}</h5>
+              <i className="text-2xl front-thin ri-map-pin-line"></i>
+              <h5 className='text-lg font-medium'>{Math.round(earnings.totaldistance)} KM</h5>
               <p className='text-sm text-gray-600'> Distance </p>
               </div>
 
               <div className='text-center'>
-              <i className="text-2xl front-thin ri-speed-up-line"></i>
-              <h5 className='text-lg font-medium'>{Math.round(earnings.totalduration)}</h5>
+              <i className="text-2xl front-thin ri-time-line"></i>
+              <h5 className='text-lg font-medium'>{(earnings.totalduration / 60).toFixed(1)}</h5>
               <p className='text-sm text-gray-600'> Hours Online</p>
               </div>
 

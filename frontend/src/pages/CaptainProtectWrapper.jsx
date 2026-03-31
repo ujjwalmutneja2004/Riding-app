@@ -74,6 +74,9 @@ const CaptainProtectWrapper = ({ children }) => {
         .then(response => {
             console.log("✅ Captain authenticated successfully:", response.data);
             setIsAuthenticated(true);
+            if (response.data.captain.status !== 'approved') {
+                navigate('/captain-status', { replace: true });
+            }
         })
         .catch(err => {
             console.error("❌ Captain authentication failed:", err);

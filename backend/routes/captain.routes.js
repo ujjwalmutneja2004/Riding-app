@@ -2,10 +2,16 @@ const express=require('express')
 const router=express.Router();
 const {body}=require('express-validator');
 const captainController=require('../controllers/captain.controller')
-const registerCaptain=require('../services/captain.service');
+const upload = require('../middlewares/multer.middleware');
 const authMiddleware = require('../middlewares/auth.middleware');
 
-router.post('/register',[
+router.post('/register', upload.fields([
+    { name: 'licenseFront', maxCount: 1 },
+    { name: 'licenseBack', maxCount: 1 },
+    { name: 'selfie', maxCount: 1 },
+    { name: 'numberPlate', maxCount: 1 },
+    { name: 'rc', maxCount: 1 }
+]), [
     body('fullname.firstname').isString().isLength({min:3}).withMessage('First name must be at least 3 characters long'),
     body('email').isEmail().withMessage('Please enter a valid email address'),
     body('password').isString().isLength({min:5}).withMessage('Password must be at least 5 characters long'),
@@ -32,9 +38,9 @@ router.post('/reset-password', captainController.resetPassword);
 
 router.get('/profile' ,authMiddleware.authCaptain,captainController.getCaptainProfile)
 
-router.get('/history', authMiddleware.authCaptain, captainController.getCaptainHistory)
+router.get('/history', authMiddleware.authCaptain, authMiddleware.isApproved, captainController.getCaptainHistory)
 
-router.get('/analytics', authMiddleware.authCaptain, captainController.getCaptainAnalytics)
+router.get('/analytics', authMiddleware.authCaptain, authMiddleware.isApproved, captainController.getCaptainAnalytics)
 
 router.post('/logout', authMiddleware.authCaptain, captainController.logoutCaptain);
 module.exports=router;
