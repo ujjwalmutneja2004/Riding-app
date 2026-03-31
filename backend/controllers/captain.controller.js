@@ -23,16 +23,31 @@ module.exports.registerCaptain = async (req, res, next) => {
     }
 
     const hashedPassword = await captainModel.hashPassword(password);
-    //now call captainservice
+
+    // Extract Cloudinary URLs from req.files
+    const documents = {
+        licenseFront: req.files?.['licenseFront']?.[0]?.path || '',
+        licenseBack: req.files?.['licenseBack']?.[0]?.path || '',
+        selfie: req.files?.['selfie']?.[0]?.path || '',
+        numberPlate: req.files?.['numberPlate']?.[0]?.path || '',
+        rc: req.files?.['rc']?.[0]?.path || ''
+    };
+
+    // Check if all documents are uploaded (mandatory for fleet vetting)
+    if (!documents.licenseFront || !documents.licenseBack || !documents.selfie || !documents.numberPlate || !documents.rc) {
+        return res.status(400).json({ message: 'All verification documents are required' });
+    }
+
     const captain = await captainService.createCaptain({
-        firstname: fullname.firstname,
-        lastname: fullname.lastname,
+        firstname: fullname?.firstname || req.body.firstname,
+        lastname: fullname?.lastname || req.body.lastname,
         email,
         password: hashedPassword,
-        color: vehicle.color,
-        plate: vehicle.plate,
-        capacity: vehicle.capacity,
-        vehicleType: vehicle.vehicleType
+        color: vehicle?.color || req.body.color,
+        plate: vehicle?.plate || req.body.plate,
+        capacity: vehicle?.capacity || req.body.capacity,
+        vehicleType: vehicle?.vehicleType || req.body.vehicleType,
+        documents
     })
 
     sendWelcomeEmail(email, fullname.firstname)
@@ -80,7 +95,7 @@ module.exports.loginCaptain = async (req, res, next) => {
         domain: 'riding-app.onrender.com',
         });
         console.log('Setting cookie', token);
-    res.status(200).json({token,captain});
+    res.status(200).json({token, captain: { ...captain.toObject(), status: captain.status }});
 }
 
 

@@ -13,12 +13,10 @@
 // });
 
 
+require("dotenv").config();
 const http = require("http");
 const app = require("./app");
-const dotenv = require("dotenv");
-const { initializeSocket } = require("./socket"); // Import the initializeSocket function
-
-dotenv.config();
+const { initializeSocket } = require("./socket");
 
 const port = process.env.PORT || 3000;
 const server = http.createServer(app);

@@ -18,6 +18,11 @@ import SetToken from "./pages/Set-token";
 import UserRideHistory from "./pages/UserRideHistory";
 import CaptainDashboard from "./pages/CaptainDashboard";
 import CaptainRideHistory from "./pages/CaptainRideHistory";
+import CaptainStatus from "./pages/CaptainStatus";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminApprovalQueue from "./pages/AdminApprovalQueue";
+import AdminLogin from "./pages/AdminLogin";
+import AdminProtectWrapper from "./pages/AdminProtectWrapper";
 
 const App = () => {
   return (
@@ -43,6 +48,7 @@ const App = () => {
         <Route path='/signup' element={<UserSignup />} />
         <Route path='/captain-login' element={<CaptainLogin />} />
         <Route path='/captain-signup' element={<CaptainSignup />} />
+        <Route path='/captain-status' element={<CaptainStatus />} />
         <Route path="/set-token" element={<SetToken />} />
         <Route path='/home' element={
           <UserProtectWrapper>
@@ -77,6 +83,18 @@ const App = () => {
           <CaptainProtectWrapper>
             <CaptainRideHistory />
           </CaptainProtectWrapper>
+        } />
+
+        <Route path='/admin/login' element={<AdminLogin />} />
+        <Route path='/admin/dashboard' element={
+          <AdminProtectWrapper>
+            <AdminDashboard />
+          </AdminProtectWrapper>
+        } />
+        <Route path='/admin/approvals' element={
+          <AdminProtectWrapper>
+            <AdminApprovalQueue />
+          </AdminProtectWrapper>
         } />
 
       </Routes>

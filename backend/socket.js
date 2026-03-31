@@ -32,7 +32,7 @@ function initializeSocket(server) {
 
         
       } else if (userType === "captain") {
-        await captainModel.findByIdAndUpdate(userId, { socketId: socket.id , status: 'active'});
+        await captainModel.findByIdAndUpdate(userId, { socketId: socket.id, isAvailable: true });
         console.log(`Captain ${userId} joined with socket ${socket.id} and userType ${userType}`);
       }
     });
@@ -74,7 +74,7 @@ function initializeSocket(server) {
   
       // Optionally clear socketId from DB
       await userModel.updateOne({ socketId: socket.id }, { $unset: { socketId: "" } });
-      await captainModel.updateOne({ socketId: socket.id }, { $unset: { socketId: "" } , $set: { status: 'inactive' }});
+      await captainModel.updateOne({ socketId: socket.id }, { $unset: { socketId: "" } , $set: { isAvailable: false }});
     });
   });
 } 

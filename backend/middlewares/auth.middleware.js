@@ -72,3 +72,43 @@ module.exports.authCaptain = async (req, res, next) => {
         return res.status(401).json({ message: 'Unauthorized - Invalid or expired token' });
     }
 };
+
+module.exports.isApproved = async (req, res, next) => {
+    if (req.captain.status !== 'approved') {
+        return res.status(403).json({ 
+            message: 'Your account is not approved yet or has been rejected.', 
+            status: req.captain.status,
+            reason: req.captain.rejectionReason 
+        });
+    }
+next();
+};
+
+module.exports.authAdmin = async (req, res, next) => {
+    const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthenticated' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Ensure the token belongs to an admin (we add role: 'admin' to the payload)
+        if (decoded.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden - Not an admin' });
+        }
+
+        const adminModel = require('../models/admin.model');
+        const admin = await adminModel.findById(decoded._id);
+
+        if (!admin) {
+            return res.status(401).json({ message: 'Unauthorized - Admin not found' });
+        }
+
+        req.admin = admin;
+        return next();
+    } catch (err) {
+        return res.status(401).json({ message: 'Unauthorized - Invalid token' });
+    }
+};

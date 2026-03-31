@@ -10,6 +10,7 @@ const userRoutes=require('./routes/user.routes')
 const captainRoutes=require('./routes/captain.routes')
 const mapsRoutes=require('./routes/maps.routes')
 const rideRoutes=require('./routes/ride.routes')
+const adminRoutes=require('./routes/admin.routes')
 const User = require('./models/user.model');
 
 const paymentRoutes = require("./routes/paymentRoutes");
@@ -178,6 +179,7 @@ console.log("entering register captain")
 app.use('/captains',captainRoutes)
 app.use('/maps',mapsRoutes)
 app.use('/rides',rideRoutes)
+app.use('/admin', adminRoutes)
 
 
 module.exports=app;
