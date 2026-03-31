@@ -58,7 +58,17 @@ const CaptainStatus = () => {
     const isRejected = captain.status === 'rejected';
 
     return (
-        <div className="h-screen bg-[#fbf8fd] flex flex-col items-center justify-center p-6 text-center font-['Inter']">
+        <div className="h-screen bg-[#fbf8fd] flex flex-col items-center justify-center p-6 text-center font-['Inter'] relative">
+            <button 
+                onClick={() => {
+                    localStorage.removeItem('token');
+                    navigate('/captain-login');
+                }}
+                className="absolute top-10 right-10 flex items-center gap-2 bg-white px-4 py-2 rounded-2xl text-gray-500 font-medium shadow-sm hover:text-red-600 transition-all border border-[#efedf2]"
+            >
+                <i className="ri-logout-box-line"></i>
+                Sign Out
+            </button>
             <img src={logo} alt="TravelX Logo" className="w-32 mb-12" />
             
             <div className="max-w-md w-full bg-white p-10 rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.05)] border border-[#efedf2]">

@@ -29,7 +29,14 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#fbf8fd] flex flex-col justify-center py-12 px-6 lg:px-8 font-['Inter']">
+        <div className="min-h-screen bg-[#fbf8fd] flex flex-col justify-center py-12 px-6 lg:px-8 font-['Inter'] relative">
+            <button 
+                onClick={() => navigate('/')}
+                className="absolute top-10 left-10 flex items-center gap-2 text-gray-400 hover:text-[#010102] transition-all font-medium uppercase tracking-widest text-[10px]"
+            >
+                <i className="ri-arrow-left-line text-lg"></i>
+                Back Home
+            </button>
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <img className="mx-auto h-16 w-auto mb-8" src={logo} alt="TravelX Admin" />
                 
