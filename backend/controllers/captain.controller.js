@@ -2,19 +2,21 @@ const captainModel = require('../models/captain.model');
 //services are for creation of user/captain
 const captainService = require('../services/captain.service');
 const { validationResult } = require('express-validator');
-const blackListTokenModel=require('../models/blacklist.Token.model')
+const blackListTokenModel = require('../models/blacklist.Token.model')
 const sendWelcomeEmail = require('../email');
 
 
 ///const { validationResult } = require('express-validator'); is used to extract validation results from a request when you're using express-validator in an Express.js app.
 
 module.exports.registerCaptain = async (req, res, next) => {
-    console.log("register captain");
+    console.log("register captain contoller ");
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    
+
+    console.log("validation passed")
+
     const { fullname, email, password, vehicle } = req.body;
     const isCaptainAlready = await captainModel.findOne({ email });
 
@@ -50,52 +52,54 @@ module.exports.registerCaptain = async (req, res, next) => {
         documents
     })
 
-    sendWelcomeEmail(email, fullname.firstname)
-  .catch(err => {
-    console.error("Welcome email failed:", err.message);
-  });
+    console.log("out of service captain");
 
-    const token=captain.generateAuthToken();
-     res.cookie('token', token, {
+    //     sendWelcomeEmail(email, fullname.firstname)
+    //   .catch(err => {
+    //     console.error("Welcome email failed:", err.message);
+    //   });
+
+    const token = captain.generateAuthToken();
+    res.cookie('token', token, {
         // httpOnly: true,  // Prevents client-side JS from accessing the cookie
         secure: process.env.NODE_ENV === 'production',
         secure: true,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
         sameSite: 'None', // Required for cross-site requests
-        });
-    res.status(201).json({token,captain});
+    });
+    res.status(201).json({ token, captain });
 }
 
 
 
 module.exports.loginCaptain = async (req, res, next) => {
-    const errors=validationResult(req)
-    if(!errors.isEmpty()){
-        return res.status(400).json({errors:errors.array()})
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
     }
 
-    const { email,password }=req.body;
+    const { email, password } = req.body;
 
-    const captain=await captainModel.findOne({email}).select("+password");
+    const captain = await captainModel.findOne({ email }).select("+password");
 
-    if(!captain){
-        return res.status(400).json({message:'Invalid email or password'})
+    if (!captain) {
+        return res.status(400).json({ message: 'Invalid email or password' })
     }
 
-    const isMatch=await captain.comparePassword(password);
-    if(!isMatch){
-        return res.status(400).json({message:'Invalid email or password'})
+    const isMatch = await captain.comparePassword(password);
+    if (!isMatch) {
+        return res.status(400).json({ message: 'Invalid email or password' })
     }
 
-    const token=captain.generateAuthToken();
+    const token = captain.generateAuthToken();
     res.cookie('token', token, {
         // httpOnly: true,  // Prevents client-side JS from accessing the cookie
         secure: false,    // Ensures the cookie is sent only over HTTPS (disable for localhost testing)
         sameSite: 'None', // Required for cross-site requests
         path: '/',
         domain: 'riding-app.onrender.com',
-        });
-        console.log('Setting cookie', token);
-    res.status(200).json({token, captain: { ...captain.toObject(), status: captain.status }});
+    });
+    console.log('Setting cookie', token);
+    res.status(200).json({ token, captain: { ...captain.toObject(), status: captain.status } });
 }
 
 
@@ -121,14 +125,14 @@ module.exports.getCaptainProfile = async (req, res, next) => {
 //              // cache: 'no-store'   
 //         });
 //         res.set("Cache-Control", "no-store"); 
-    
-    
+
+
 //         const token=req.cookies.token|| (req.headers.authorization && req.headers.authorization.split(' ')[1]);
 //         if (!token) {
 //             return res.status(400).json({ message: 'No token provided' });
 //         }
 //         await blackListTokenModel.create({token});
-       
+
 //         res.status(200).json({message:'Logout successfully'});
 
 //     }
@@ -136,7 +140,7 @@ module.exports.getCaptainProfile = async (req, res, next) => {
 //         res.status(500).json({message:'Something went wrong'})
 //     }  
 // }
-module.exports.logoutCaptain = async (req, res, next) => {  
+module.exports.logoutCaptain = async (req, res, next) => {
     console.log("Inside logoutCaptain controller - Starting execution");
 
     try {
@@ -220,18 +224,18 @@ module.exports.getCaptainAnalytics = async (req, res, next) => {
 
         // Fetch all completed rides to compute stats in memory (more compatible across mongo versions than complex pipelines for a small scale app)
         const rides = await rideModel.find({ captain: captainId, status: 'completed' });
-        
+
         let totalEarnings = 0;
         let totalRides = rides.length;
-        
+
         // Compute last 7 days earnings
         const today = new Date();
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(today.getDate() - 7);
-        
+
         const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
         const thisYearStart = new Date(today.getFullYear(), 0, 1);
-        
+
         let last7DaysEarnings = 0;
         let thisMonthEarnings = 0;
         let thisYearEarnings = 0;
@@ -239,10 +243,10 @@ module.exports.getCaptainAnalytics = async (req, res, next) => {
         rides.forEach(ride => {
             const fare = ride.fare || 0;
             totalEarnings += fare;
-            
+
             // For simplicity, we use the internal MongoDB timestamp (_id) if no createdAt is defined
             const rideDate = ride._id.getTimestamp();
-            
+
             if (rideDate >= sevenDaysAgo) last7DaysEarnings += fare;
             if (rideDate >= thisMonthStart) thisMonthEarnings += fare;
             if (rideDate >= thisYearStart) thisYearEarnings += fare;

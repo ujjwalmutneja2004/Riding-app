@@ -1,16 +1,16 @@
-const dotenv=require('dotenv')
+const dotenv = require('dotenv')
 dotenv.config()
-const express=require('express');
-const cors=require('cors');
-const cookieParser=require('cookie-parser')
+const express = require('express');
+const cors = require('cors');
+const cookieParser = require('cookie-parser')
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
-const userRoutes=require('./routes/user.routes')
-const captainRoutes=require('./routes/captain.routes')
-const mapsRoutes=require('./routes/maps.routes')
-const rideRoutes=require('./routes/ride.routes')
-const adminRoutes=require('./routes/admin.routes')
+const userRoutes = require('./routes/user.routes')
+const captainRoutes = require('./routes/captain.routes')
+const mapsRoutes = require('./routes/maps.routes')
+const rideRoutes = require('./routes/ride.routes')
+const adminRoutes = require('./routes/admin.routes')
 const User = require('./models/user.model');
 
 const paymentRoutes = require("./routes/paymentRoutes");
@@ -20,28 +20,28 @@ const stripe = new Stripe(process.env.SECRET_KEY);
 
 
 
-const app=express();
+const app = express();
 //const port=process.env.PORT || 3000;
 
-const connectToDb=require('./db/db');
+const connectToDb = require('./db/db');
 
 connectToDb();
 
 app.use(cors({
-//  origin: "*", // Allows requests from any origin
-origin: [
-  "http://localhost:5173",
-  // "https://29dv0wmq-5173.inc1.devtunnels.ms",
-  "https://travelx-five.vercel.app",
-  "https://riding-app.onrender.com" 
-], // Explicit frontend URL
+  //  origin: "*", // Allows requests from any origin
+  origin: [
+    "http://localhost:5173",
+    // "https://29dv0wmq-5173.inc1.devtunnels.ms",
+    "https://travelx-five.vercel.app",
+    "https://riding-app.onrender.com"
+  ], // Explicit frontend URL
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization",
   credentials: true // Set this to false if not using cookies
 }));
- 
+
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 
@@ -67,10 +67,10 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
 
-//  MongoDB se find karo koi user jiska googleId field equal ho profile.id ke.
-// Agar mila → wohi user hai → uspe login successful
-// Nahi mila → shayad naye user hain → email se check karo → nahi to naya bana lo.
-//profile.id → Google ke taraf se diya gaya unique ID hota hai (har Google account ke liye unique hota hai).
+      //  MongoDB se find karo koi user jiska googleId field equal ho profile.id ke.
+      // Agar mila → wohi user hai → uspe login successful
+      // Nahi mila → shayad naye user hain → email se check karo → nahi to naya bana lo.
+      //profile.id → Google ke taraf se diya gaya unique ID hota hai (har Google account ke liye unique hota hai).
       try {
         let user = await User.findOne({ googleId: profile.id });
 
@@ -129,7 +129,7 @@ app.get(
 
 app.get(
   '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login',session: false  }),
+  passport.authenticate('google', { failureRedirect: '/login', session: false }),
   async (req, res) => {
     try {
       // Generate a JWT token for the authenticated user
@@ -143,10 +143,10 @@ app.get(
         secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
         sameSite: 'None', // Required for cross-site cookies
       });
-        
+
       console.log('Cookie set successfully');
       // Redirect to the frontend home page
-       res.redirect(`https://travelx-five.vercel.app/set-token?token=${token}`);
+      res.redirect(`https://travelx-five.vercel.app/set-token?token=${token}`);
       // res.redirect('https://travelx-five.vercel.app/home');
     } catch (error) {
       console.error('Error in Google OAuth callback:', error);
@@ -168,18 +168,22 @@ app.get('/logout', (req, res) => {
 
 
 
-app.get('/',(req,res)=>{
-    res.send('Hello World');
+app.get('/', (req, res) => {
+  res.send('Hello World');
 })
 
 app.use('/api/payment', paymentRoutes);
-app.use('/users',userRoutes)
+app.use('/users', userRoutes)
 
 console.log("entering register captain")
-app.use('/captains',captainRoutes)
-app.use('/maps',mapsRoutes)
-app.use('/rides',rideRoutes)
+app.use('/captains', captainRoutes)
+app.use('/maps', mapsRoutes)
+app.use('/rides', rideRoutes)
 app.use('/admin', adminRoutes)
+app.use((err, req, res, next) => {
+  console.error("🔥 GLOBAL ERROR:", err);
+  res.status(500).json({ message: err.message });
+});
 
 
-module.exports=app;
+module.exports = app;
