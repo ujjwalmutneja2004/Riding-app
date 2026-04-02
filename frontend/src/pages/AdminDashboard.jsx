@@ -12,20 +12,25 @@ const AdminDashboard = () => {
         rejected: 0,
         active: 0
     });
+    const [companyWallet, setCompanyWallet] = useState({ totalBalance: 0, totalCommissionEarned: 0 });
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/admin/stats`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                setStats(response.data);
+                const [statsRes, walletRes] = await Promise.all([
+                    axios.get(`${import.meta.env.VITE_BASE_URL}/admin/stats`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    }),
+                    axios.get(`${import.meta.env.VITE_BASE_URL}/admin/company-balance`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    })
+                ]);
+                setStats(statsRes.data);
+                setCompanyWallet(walletRes.data);
             } catch (err) {
-                console.error("Error fetching admin stats:", err);
+                console.error("Error fetching admin data:", err);
             } finally {
                 setLoading(false);
             }
@@ -46,16 +51,26 @@ const AdminDashboard = () => {
                 <img src={logo} alt="Logo" className="w-24 mb-12" />
                 
                 <nav className="flex-1 space-y-2">
-                    <button className="w-full text-left p-3 rounded-xl bg-[#010102] text-white flex items-center gap-3 shadow-lg shadow-[#010102]/20">
+                    <button 
+                        onClick={() => navigate('/admin/dashboard')}
+                        className="w-full text-left p-3 rounded-xl bg-[#010102] text-white flex items-center gap-3 shadow-lg shadow-[#010102]/20 transition-all font-bold text-sm"
+                    >
                         <i className="ri-dashboard-line"></i>
-                        <span className="font-medium text-sm">Overview</span>
+                        <span>Overview</span>
                     </button>
                     <button 
                         onClick={() => navigate('/admin/approvals')}
-                        className="w-full text-left p-3 rounded-xl hover:bg-white text-gray-500 hover:text-black flex items-center gap-3 transition-all"
+                        className="w-full text-left p-3 rounded-xl hover:bg-white text-gray-400 hover:text-black flex items-center gap-3 transition-all font-bold text-sm"
                     >
                         <i className="ri-user-follow-line"></i>
-                        <span className="font-medium text-sm">Approvals</span>
+                        <span>Approvals</span>
+                    </button>
+                    <button 
+                        onClick={() => navigate('/admin/captains')}
+                        className="w-full text-left p-3 rounded-xl hover:bg-white text-gray-400 hover:text-black flex items-center gap-3 transition-all font-bold text-sm"
+                    >
+                        <i className="ri-steering-2-line"></i>
+                        <span>Captains</span>
                     </button>
                 </nav>
 
@@ -106,10 +121,10 @@ const AdminDashboard = () => {
                     <div className="space-y-12">
                         {/* Stats Grid */}
                         <div className="grid grid-cols-4 gap-6">
+                            <StatCard label="TravelX Balance" value={`₹${companyWallet.totalBalance.toFixed(2)}`} color="bg-[#7b5900]" textColor="text-white" highlight />
                             <StatCard label="Total Fleet" value={stats.total} color="bg-[#010102]" textColor="text-white" />
-                            <StatCard label="Pending" value={stats.pending} subText="Pending Review" highlight />
+                            <StatCard label="Pending" value={stats.pending} subText="Pending Review" />
                             <StatCard label="Approved" value={stats.approved} />
-                            <StatCard label="Rejected" value={stats.rejected} />
                         </div>
 
                         <div className="grid grid-cols-3 gap-10">

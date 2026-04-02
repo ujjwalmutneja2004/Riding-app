@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { useState, useRef,useEffect,useContext } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CaptainDetails from '../components/CaptainDetails';
 import RidePopUp from '../components/RidePopUp';
@@ -10,360 +9,212 @@ import ConfirmRidePopUp from '../components/ConfirmRideUp';
 import { Link } from 'react-router-dom';
 import { SocketContext } from '../context/SocketContext'
 import { CaptainDataContext } from '../context/CaptainContext';
+import WalletHistoryDrawer from '../components/WalletHistoryDrawer';
 import logo from '../assets/logoo.png';
 
 import axios from 'axios';
 
 const CaptainHome = () => {
-  const navigate = useNavigate(); 
-  
-  const[ ridePopupPanel , setRidePopupPanel ] = useState(false);
-  const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
-  const [captainLocation, setCaptainLocation] = useState(null);
+    const navigate = useNavigate();
 
+    const [ridePopupPanel, setRidePopupPanel] = useState(false);
+    const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
+    const [walletHistoryPanel, setWalletHistoryPanel] = useState(false);
+    const [captainLocation, setCaptainLocation] = useState(null);
 
-  const ridePopupPanelRef = useRef(null);
-  const confirmRidePopupPanelRef = useRef(null)
+    const ridePopupPanelRef = useRef(null);
+    const confirmRidePopupPanelRef = useRef(null);
+    const walletHistoryPanelRef = useRef(null);
 
-  const { socket } = useContext(SocketContext);
-  const { captain } = useContext(CaptainDataContext);
-  const [ride, setRide] = useState(null);
-  console.log("captainaagya"+captain)
+    const { socket } = useContext(SocketContext);
+    const { captain } = useContext(CaptainDataContext);
+    const [ride, setRide] = useState(null);
 
+    useEffect(() => {
+        if (!captain?._id) return;
 
-  // useEffect(() => {
-  //   socket.emit('join', {
-  //     userId: captain._id,
-  //     userType: 'captain'
-  //   });
-  
-  //   const updateLocation = () => {
-  //     if (navigator.geolocation) {
-  //       console.log("📍 Trying to get current location...");
-        
-  //       navigator.geolocation.getCurrentPosition(
-  //         (position) => {
-  //           console.log("✅ Location fetched:", {
-  //             lat: position.coords.latitude,
-  //             lng: position.coords.longitude,
-  //             accuracy: position.coords.accuracy + " meters"
-  //           });
+        socket.emit('join', {
+            userId: captain._id,
+            userType: 'captain'
+        });
 
+        const updateLocation = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        setCaptainLocation({ lat, lng });
+                        socket.emit('update-location-captain', {
+                            userId: captain._id,
+                            location: { lat, lng }
+                        });
+                    },
+                    (error) => {
+                        console.error("❌ Geolocation error:", error.message);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            }
+        };
 
-  //             // Update captainLocation state with the new location
-  //             setCaptainLocation({
-  //               lat: position.coords.latitude,
-  //               lng: position.coords.longitude,
-  //           });
-    
-  //           socket.emit('update-location-captain', {
-  //             userId: captain._id,
-  //             location: {
-  //               lat: position.coords.latitude,
-  //               lng: position.coords.longitude
-  //             }
-  //           });
-  //         },
-  //         (error) => {
-  //           console.error("❌ Geolocation error:", error.message);
-  //         },
-  //         {
-  //           enableHighAccuracy: true,
-  //           timeout: 10000,       // Wait max 10 sec
-  //           maximumAge: 0         // Always fetch new location, no cache
-  //         }
-  //       );
-  //     } else {
-  //       console.error("🚫 Geolocation not supported by this browser.");
-  //     }
-  //   };
-    
-  //   // Call once immediately
-  //   updateLocation();
-    
-  //   // Repeat every 10 seconds
-  //   const locationInterval = setInterval(updateLocation, 10000);
-    
-  //   // Cleanup on unmount
-  //   return () => clearInterval(locationInterval)
-  // });
+        updateLocation();
+        const locationInterval = setInterval(updateLocation, 10000);
+        return () => clearInterval(locationInterval);
 
-
-
-  useEffect(() => {
-    if (!captain?._id) return;
-
-
- 
-
-    // Join the socket room
-    socket.emit('join', {
-      userId: captain._id,
-      userType: 'captain'
-    });
-  
-    // Location updater
-    const updateLocation = () => {
-      if (navigator.geolocation) {
-        console.log("📍 Trying to get current location...");
-  
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const accuracy = position.coords.accuracy;
-  
-            console.log("✅ Location fetched:", {
-              lat,
-              lng,
-              accuracy: `${accuracy} meters`
-            });
-  
-            // Store in state to pass as prop elsewhere
-            setCaptainLocation({ lat, lng });
-  
-            // Emit to backend
-            socket.emit('update-location-captain', {
-              userId: captain._id,
-              location: { lat, lng }
-            });
-          },
-          (error) => {
-            console.error("❌ Geolocation error:", error.message);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
-      } else {
-        console.error("🚫 Geolocation not supported by this browser.");
-      }
-    };
-  
-    // Immediate call
-    updateLocation();
-  
-    // Repeat every 10 seconds
-    const locationInterval = setInterval(updateLocation, 10000);
-  
-    // Clean up
-    return () => clearInterval(locationInterval);
-  
-  }, [captain, socket]);
-  
-  
-    
-  
-//   ✅ What it does:
-
-// Checks if the browser supports geolocation.
-
-// If yes:
-
-// Gets the user's current latitude and longitude.
-
-// Sends it to the server using socket.emit('update-location-captain', {...}).
-
-// Logs the location in the browser console.
-
-// If not:
-
-// Logs an error saying geolocation isn’t supported
-
-// As soon as the component mounts, it starts calling updateLocation() every 10 seconds.
-
-// This means the captain's current location will be sent to the server repeatedly, keeping their position live/updated on the map or backend.
-
-// On unmount (or component update), it clears the interval to avoid memory leaks
-  
-
-
+    }, [captain, socket]);
 
     socket.on('new-ride', (data) => {
-      console.log("New ride data received:", data);
-      setRide(data);
-      setRidePopupPanel(true);
+        setRide(data);
+        setRidePopupPanel(true);
     })
 
     async function confirmRide() {
-
-      const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm-ride`,{
-      rideId:ride._id,
-      captainId:captain._id,
-        
-    },{
-      headers:{
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-
-    setRidePopupPanel(false);
-    setConfirmRidePopupPanel(true);
+        await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm-ride`, {
+            rideId: ride._id,
+            captainId: captain._id,
+        }, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+        setRidePopupPanel(false);
+        setConfirmRidePopupPanel(true);
     }
 
+    useGSAP(function () {
+        if (ridePopupPanel) {
+            gsap.to(ridePopupPanelRef.current, { transform: "translateY(0)" });
+        } else {
+            gsap.to(ridePopupPanelRef.current, { transform: "translateY(100%)" });
+        }
+    }, [ridePopupPanel]);
 
+    useGSAP(function () {
+        if (confirmRidePopupPanel) {
+            gsap.to(confirmRidePopupPanelRef.current, { transform: "translateY(0)" });
+        } else {
+            gsap.to(confirmRidePopupPanelRef.current, { transform: "translateY(100%)" });
+        }
+    }, [confirmRidePopupPanel]);
 
+    useGSAP(function () {
+        if (walletHistoryPanel) {
+            gsap.to(walletHistoryPanelRef.current, { transform: "translateY(0)" });
+        } else {
+            gsap.to(walletHistoryPanelRef.current, { transform: "translateY(100%)" });
+        }
+    }, [walletHistoryPanel]);
 
+    const handleLogout = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {}, {
+                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true,
+            });
+            if (response.status === 200) {
+                localStorage.removeItem('token');
+                navigate('/captain-login');
+            }
+        } catch (error) {
+            console.error('Error logging out:', error.response?.data || error.message);
+        }
+    };
 
+    return (
+        <div className="h-screen relative overflow-hidden">
+            {/* Header */}
+            <div className="fixed p-6 top-0 flex items-center justify-between w-screen z-20">
+                <div>
+                   <img className="w-20 h-15" src={logo} alt="Logo" />
+                </div>
 
-  useGSAP(function() {
-    if (ridePopupPanel) {
-      gsap.to(ridePopupPanelRef.current, {
-        transform: "translateY(0)"
-      });
-    } else {
-      gsap.to(ridePopupPanelRef.current, {
-        transform: "translateY(100%)",
-      });
-    }
-  },[ridePopupPanel]);
+                <div className="flex items-center gap-3">
+                    {/* New Wallet History Button */}
+                    <button
+                        onClick={() => setWalletHistoryPanel(true)}
+                        className="h-10 w-10 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex items-center justify-center rounded-full border border-gray-50 text-gray-800 hover:bg-black hover:text-white transition-all active:scale-90"
+                        title="Wallet History"
+                    >
+                        <i className="text-lg ri-wallet-3-line"></i>
+                    </button>
 
-  useGSAP(
-    function () {
-      if (confirmRidePopupPanel) {
-        gsap.to(confirmRidePopupPanelRef.current, {
-          transform: "translateY(0)",
-        });
-      } else {
-        gsap.to(confirmRidePopupPanelRef.current, {
-          transform: "translateY(100%)",
-        });
-      }
-    },
-    [confirmRidePopupPanel]
-  );
+                    <button
+                        onClick={() => navigate('/captain-history')}
+                        className="h-10 w-10 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex items-center justify-center rounded-full border border-gray-50 hover:bg-black hover:text-white transition-all active:scale-90"
+                        title="Ride History"
+                    >
+                        <i className="text-lg ri-history-line"></i>
+                    </button>
 
+                    <button
+                        onClick={() => navigate('/captain-dashboard')}
+                        className="h-10 w-10 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex items-center justify-center rounded-full border border-gray-50 hover:bg-black hover:text-white transition-all active:scale-90"
+                        title="Analytics"
+                    >
+                        <i className="text-lg ri-bar-chart-grouped-line"></i>
+                    </button>
 
-  
-  // const handleLogout = async () => {
-  //   try {
-  //     const token = localStorage.getItem('token');
-  //     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
-  //       method: 'POST',
-  //       credentials: 'include', // Important for session-based authentication
-  //     });
+                    <button
+                        onClick={handleLogout}
+                        className="h-10 w-10 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex items-center justify-center rounded-full border border-gray-50 text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                        title="Sign Out"
+                    >
+                        <i className="text-lg ri-logout-box-line"></i>
+                    </button>
+                </div>
+            </div>
 
-  //     if (response.ok) {
-  //       // Clear any authentication tokens if stored
-  //       localStorage.removeItem('token');
+            {/* Map Placeholder */}
+            <div className="h-3/5">
+                <img className="h-full w-full object-cover" src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="Map" />
+            </div>
 
-  //       console.log('Captain logout worked');
+            {/* Captain Details Wrapper */}
+            <div className="h-2/5 p-6 bg-white relative z-10 shadow-[0_-10px_50px_rgba(0,0,0,0.05)] rounded-t-[3rem]">
+                <CaptainDetails />
+            </div>
 
-  //       // Redirect to login page
-  //       navigate('/captain-login'); 
-  //     } else {
-  //       console.error('Logout failed');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error logging out:', error);
-  //   }
-  // };
+            {/* Wallet History Drawer */}
+            <div
+                ref={walletHistoryPanelRef}
+                className="fixed w-full h-[85vh] z-30 bottom-0 translate-y-full bg-white px-8 py-10 rounded-t-[3rem] shadow-[0_-20px_100px_rgba(0,0,0,0.15)] border-t border-gray-100"
+            >
+                <WalletHistoryDrawer onClose={() => setWalletHistoryPanel(false)} />
+            </div>
 
- 
-const handleLogout = async () => {
-  try {
-    const token = localStorage.getItem('token');
+            {/* Ride PopUp panel */}
+            <div
+                ref={ridePopupPanelRef}
+                className="fixed w-full z-40 bottom-0 translate-y-full bg-white px-3 py-10 pt-12"
+            >
+                <RidePopUp
+                    ride={ride}
+                    setRidePopupPanel={setRidePopupPanel}
+                    setConfirmRidePopupPanel={setConfirmRidePopupPanel}
+                    confirmRide={confirmRide}
+                />
+            </div>
 
-    const response = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/captains/logout`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      }
-    );
-
-    if (response.status === 200) {
-      // Clear any authentication tokens if stored
-      localStorage.removeItem('token');
-      console.log('Captain logout worked');
-
-      // Redirect to login page
-      navigate('/captain-login'); 
-    } 
-  } catch (error) {
-    console.error('Error logging out:', error.response?.data || error.message);
-  }
-};
-
-
-
-
-
-
-
-
-
-
-  
-  return (
-    <div className="h-screen">
-      <div className="fixed p-6 top-0 flex items-center justify-between w-screen">
-          <img className="w-20 h-15" src={logo} alt="Logo" />
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/captain-history')}
-            className="h-8 w-10 bg-white flex items-center justify-center rounded-full shadow-md"
-          >
-            <i className="text-lg font-medium ri-history-line"></i>
-          </button>
-
-          <button
-            onClick={() => navigate('/captain-dashboard')}
-            className="h-8 w-10 bg-white flex items-center justify-center rounded-full shadow-md"
-          >
-            <i className="text-lg font-medium ri-bar-chart-grouped-line"></i>
-          </button>
-
-          <button
-            onClick={handleLogout}
-            className="h-8 w-10 bg-white flex items-center justify-center rounded-full shadow-md"
-          >
-            <i className="text-lg font-medium ri-logout-box-line"></i>
-          </button>
+            {/* Confirm Ride Pop Up panel */}
+            <div
+                ref={confirmRidePopupPanelRef}
+                className="fixed w-full h-screen z-50 bottom-0 translate-y-full bg-white px-3 py-10 pt-12"
+            >
+                <ConfirmRidePopUp
+                    ride={ride}
+                    setConfirmRidePopupPanel={setConfirmRidePopupPanel}
+                    setRidePopupPanel={setRidePopupPanel}
+                    captainLocation={captainLocation}
+                />
+            </div>
         </div>
-      </div>
-
-      <div className="h-3/5">
-        <img className="h-full w-full object-cover" src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="Gif" />
-      </div>
-
-      <div className="h-2/5 p-6">
-        <CaptainDetails />
-      </div>
-
-      <div
-        ref={ridePopupPanelRef}
-        className="fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12"
-      >
-        <RidePopUp
-          ride={ride}
-          setRidePopupPanel={setRidePopupPanel}
-          setConfirmRidePopupPanel={setConfirmRidePopupPanel}
-          confirmRide={confirmRide}
-        />
-      </div>
-
-      {/*Confirm Ride Pop Up panel */}
-      <div
-        ref={confirmRidePopupPanelRef}
-        className="fixed w-full h-screen z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12"
-      >
-        <ConfirmRidePopUp
-        ride={ride}
-          setConfirmRidePopupPanel={setConfirmRidePopupPanel}
-          setRidePopupPanel={setRidePopupPanel}
-           captainLocation={captainLocation}
-        />
-      </div>
-
-    </div>
-  );
+    );
 };
 
 export default CaptainHome;

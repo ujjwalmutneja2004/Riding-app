@@ -66,14 +66,24 @@ const AdminApprovalQueue = () => {
                 <nav className="flex-1 space-y-2">
                     <button 
                         onClick={() => navigate('/admin/dashboard')}
-                        className="w-full text-left p-3 rounded-xl hover:bg-white text-gray-500 hover:text-black flex items-center gap-3 transition-all"
+                        className="w-full text-left p-3 rounded-xl hover:bg-white text-gray-400 hover:text-black flex items-center gap-3 transition-all font-bold text-sm"
                     >
                         <i className="ri-dashboard-line"></i>
-                        <span className="font-medium text-sm">Overview</span>
+                        <span>Overview</span>
                     </button>
-                    <button className="w-full text-left p-3 rounded-xl bg-[#010102] text-white flex items-center gap-3 shadow-lg shadow-[#010102]/20">
+                    <button 
+                        onClick={() => navigate('/admin/approvals')}
+                        className="w-full text-left p-3 rounded-xl bg-[#010102] text-white flex items-center gap-3 shadow-lg shadow-[#010102]/20 transition-all font-bold text-sm"
+                    >
                         <i className="ri-user-follow-line"></i>
-                        <span className="font-medium text-sm">Approvals</span>
+                        <span>Approvals</span>
+                    </button>
+                    <button 
+                        onClick={() => navigate('/admin/captains')}
+                        className="w-full text-left p-3 rounded-xl hover:bg-white text-gray-400 hover:text-black flex items-center gap-3 transition-all font-bold text-sm"
+                    >
+                        <i className="ri-steering-2-line"></i>
+                        <span>Captains</span>
                     </button>
                 </nav>
 

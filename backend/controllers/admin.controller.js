@@ -1,5 +1,6 @@
 const rideModel = require('../models/ride.model');
 const adminModel = require('../models/admin.model');
+const CompanyWallet = require('../models/companyWallet.model');
 const blacklistTokenModel = require('../models/blacklist.Token.model');
 const { sendMessageToSocketId } = require('../socket');
 
@@ -124,5 +125,85 @@ module.exports.getAdminStats = async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({ message: 'Error fetching stats' });
+    }
+};
+
+module.exports.getCompanyBalance = async (req, res) => {
+    try {
+        const wallet = await CompanyWallet.getWallet();
+        res.status(200).json(wallet);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching company wallet' });
+    }
+};
+module.exports.getDetailedFleetStats = async (req, res) => {
+    try {
+        const wallet = await CompanyWallet.getWallet();
+        // Include both approved and rejected captains in the list
+        const captains = await captainModel.find({ status: { $in: ['approved', 'rejected', 'active', 'inactive'] } });
+        
+        const fleet = await Promise.all(captains.map(async (captain) => {
+            const rides = await rideModel.find({ captain: captain._id, status: 'completed' });
+            const rideCount = rides.length;
+            const grossEarnings = rides.reduce((sum, r) => sum + (r.fare || 0), 0);
+            const platformFee = grossEarnings * 0.20;
+            const netPayout = grossEarnings * 0.80;
+
+            return {
+                id: captain._id,
+                fullname: captain.fullname,
+                email: captain.email,
+                rides: rideCount,
+                grossEarnings,
+                platformFee,
+                netPayout,
+                performance: captain.averageRating || 5.0,
+                status: captain.status,
+                isAvailable: captain.isAvailable
+            };
+        }));
+
+        res.status(200).json({
+            aggregateOversight: wallet.totalCommissionEarned,
+            activeCaptainsCount: fleet.filter(f => f.isAvailable).length,
+            fleet
+        });
+    } catch (err) {
+        console.error("Error fetching detailed fleet stats:", err);
+        res.status(500).json({ message: 'Error fetching detailed fleet stats' });
+    }
+};
+
+module.exports.getCaptainDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const captain = await captainModel.findById(id).select('-password');
+        
+        if (!captain) {
+            return res.status(404).json({ message: 'Captain not found' });
+        }
+
+        // Fetch last 5 completed rides
+        const recentRides = await rideModel.find({ captain: id, status: 'completed' })
+            .sort({ createdAt: -1 })
+            .limit(5);
+
+        // Calculate total stats for this captain specifically
+        const allRides = await rideModel.find({ captain: id, status: 'completed' });
+        const totalGross = allRides.reduce((sum, r) => sum + (r.fare || 0), 0);
+        const totalPlatformFee = totalGross * 0.20;
+
+        res.status(200).json({
+            captain,
+            recentRides,
+            stats: {
+                totalGross,
+                totalPlatformFee,
+                netPayout: totalGross * 0.80
+            }
+        });
+    } catch (err) {
+        console.error("Error fetching captain details:", err);
+        res.status(500).json({ message: 'Error fetching captain details' });
     }
 };

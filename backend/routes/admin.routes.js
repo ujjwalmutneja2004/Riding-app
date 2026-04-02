@@ -23,5 +23,9 @@ router.get('/captains/pending', authMiddleware.authAdmin, adminController.getPen
 router.post('/captains/approve/:id', authMiddleware.authAdmin, adminController.approveCaptain);
 router.post('/captains/reject/:id', authMiddleware.authAdmin, adminController.rejectCaptain);
 router.get('/stats', authMiddleware.authAdmin, adminController.getAdminStats);
+router.get('/company-balance', authMiddleware.authAdmin, adminController.getCompanyBalance);
+router.get('/fleet-stats', authMiddleware.authAdmin, adminController.getDetailedFleetStats);
+router.get('/captain/:id', authMiddleware.authAdmin, adminController.getCaptainDetails);
+
 
 module.exports = router;

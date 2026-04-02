@@ -3,6 +3,7 @@ const captainModel = require('../models/captain.model');
 const captainService = require('../services/captain.service');
 const { validationResult } = require('express-validator');
 const blackListTokenModel = require('../models/blacklist.Token.model')
+const SettlementHistory = require('../models/settlement.model');
 const sendWelcomeEmail = require('../email');
 
 
@@ -242,18 +243,18 @@ module.exports.getCaptainAnalytics = async (req, res, next) => {
 
         rides.forEach(ride => {
             const fare = ride.fare || 0;
-            totalEarnings += fare;
+            const commissionRate = process.env.COMMISSION_RATE || 0.20;
+            const captainShare = fare * (1 - commissionRate);
 
-            // For simplicity, we use the internal MongoDB timestamp (_id) if no createdAt is defined
             const rideDate = ride._id.getTimestamp();
 
-            if (rideDate >= sevenDaysAgo) last7DaysEarnings += fare;
-            if (rideDate >= thisMonthStart) thisMonthEarnings += fare;
-            if (rideDate >= thisYearStart) thisYearEarnings += fare;
+            if (rideDate >= sevenDaysAgo) last7DaysEarnings += captainShare;
+            if (rideDate >= thisMonthStart) thisMonthEarnings += captainShare;
+            if (rideDate >= thisYearStart) thisYearEarnings += captainShare;
         });
 
         res.status(200).json({
-            lifetimeEarnings: totalEarnings,
+            lifetimeEarnings: req.captain.totalEarnings || 0,
             totalRides: totalRides,
             averageRating: req.captain.averageRating || 0,
             chartData: [
@@ -268,5 +269,100 @@ module.exports.getCaptainAnalytics = async (req, res, next) => {
     }
 };
 
+module.exports.getCaptainWalletStatus = async (req, res, next) => {
+    try {
+        const captain = await captainModel.findById(req.captain._id);
+        res.status(200).json({
+            wallet: captain.wallet,
+            totalEarnings: captain.totalEarnings
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch wallet status' });
+    }
+}
 
+module.exports.handleCashout = async (req, res, next) => {
+    const { bankDetails } = req.body;
+    const threshold = parseFloat(process.env.CASHOUT_THRESHOLD) || 100;
 
+    try {
+        const captain = await captainModel.findById(req.captain._id);
+
+        if (captain.wallet < threshold) {
+            return res.status(400).json({ message: `Minimum ₹${threshold} required for cashout.` });
+        }
+
+        const previousBalance = captain.wallet;
+        const amount = captain.wallet;
+
+        // Mask account number for secure history tracking
+        const accNo = bankDetails.accountNumber || "";
+        const masked = accNo.length >= 4 
+            ? "*".repeat(accNo.length - 4) + accNo.slice(-4)
+            : accNo;
+
+        // Create settlement record
+        await SettlementHistory.create({
+            captain: captain._id,
+            type: 'CASHOUT',
+            amount: amount,
+            previousBalance: previousBalance,
+            paymentMethod: 'BANK',
+            bankDetails: {
+                ...bankDetails,
+                accountNumber: accNo, // Store full for admin
+                maskedAccountNumber: masked
+            },
+            status: 'SUCCESS'
+        });
+
+        // Reset wallet
+        captain.wallet = 0;
+        await captain.save();
+
+        res.status(200).json({ message: 'Cashout successful', wallet: 0 });
+    } catch (err) {
+        console.error("Cashout error:", err);
+        res.status(500).json({ message: 'Cashout failed' });
+    }
+}
+
+module.exports.handleSettlement = async (req, res, next) => {
+    try {
+        const captain = await captainModel.findById(req.captain._id);
+
+        if (captain.wallet >= 0) {
+            return res.status(400).json({ message: 'No negative balance to settle.' });
+        }
+
+        const previousBalance = captain.wallet;
+        const amount = Math.abs(captain.wallet);
+
+        // Create settlement record
+        await SettlementHistory.create({
+            captain: captain._id,
+            type: 'COMPANY_SETTLEMENT',
+            amount: amount,
+            previousBalance: previousBalance,
+            paymentMethod: 'UPI', // Assuming UPI/Manual
+            status: 'SUCCESS'
+        });
+
+        // Reset wallet
+        captain.wallet = 0;
+        await captain.save();
+
+        res.status(200).json({ message: 'Settlement successful', wallet: 0 });
+    } catch (err) {
+        res.status(500).json({ message: 'Settlement failed' });
+    }
+}
+
+module.exports.getSettlementHistory = async (req, res, next) => {
+    try {
+        const history = await SettlementHistory.find({ captain: req.captain._id }).sort({ createdAt: -1 });
+        res.status(200).json(history);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch settlement history' });
+    }
+}
