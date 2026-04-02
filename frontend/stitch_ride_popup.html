@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Captain - New Ride Request</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-container": "#cecdff",
+              "surface": "#f5f6f7",
+              "primary-dim": "#0040cb",
+              "on-surface-variant": "#595c5d",
+              "on-error": "#ffefef",
+              "inverse-on-surface": "#9b9d9e",
+              "secondary": "#4e4fb6",
+              "outline-variant": "#abadae",
+              "on-secondary-container": "#3939a1",
+              "on-primary": "#f2f1ff",
+              "tertiary": "#903985",
+              "on-tertiary-fixed": "#41003d",
+              "tertiary-container": "#fc96e9",
+              "on-secondary-fixed": "#24228d",
+              "primary": "#0049e6",
+              "on-tertiary": "#ffeef7",
+              "surface-dim": "#d1d5d7",
+              "on-tertiary-fixed-variant": "#6e1966",
+              "on-primary-fixed-variant": "#002278",
+              "outline": "#757778",
+              "surface-bright": "#f5f6f7",
+              "surface-container-high": "#e0e3e4",
+              "surface-tint": "#0049e6",
+              "on-secondary-fixed-variant": "#4343ab",
+              "on-surface": "#2c2f30",
+              "inverse-primary": "#6a89ff",
+              "surface-variant": "#dadddf",
+              "on-primary-fixed": "#000000",
+              "error": "#b41340",
+              "inverse-surface": "#0c0f10",
+              "secondary-dim": "#4242aa",
+              "primary-fixed": "#829bff",
+              "secondary-fixed-dim": "#bebeff",
+              "secondary-fixed": "#cecdff",
+              "tertiary-fixed": "#fc96e9",
+              "on-error-container": "#510017",
+              "on-primary-container": "#001a63",
+              "surface-container-highest": "#dadddf",
+              "error-dim": "#a70138",
+              "on-background": "#2c2f30",
+              "on-secondary": "#f4f1ff",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-dim": "#822c78",
+              "primary-container": "#829bff",
+              "on-tertiary-container": "#640d5d",
+              "error-container": "#f74b6d",
+              "surface-container": "#e6e8ea",
+              "primary-fixed-dim": "#6e8cff",
+              "background": "#f5f6f7",
+              "surface-container-low": "#eff1f2",
+              "tertiary-fixed-dim": "#ec89da"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-urgent-yellow {
+            background-color: #FFD60A;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface overflow-hidden">
+<!-- Top App Bar -->
+<header class="bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border-b-[0.5px] border-slate-200/50 dark:border-slate-800/50 shadow-[0_8px_32px_rgba(0,0,0,0.06)] fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16">
+<div class="font-manrope text-xl font-black italic tracking-tighter text-[#0052FF] dark:text-[#3d82ff]">Captain</div>
+<div class="flex gap-4">
+<button class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:scale-95 duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:scale-95 duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+</button>
+<button class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:scale-95 duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+</button>
+</div>
+</header>
+<!-- Main Content (Map Background) -->
+<main class="relative h-screen w-full">
+<!-- Background Map Image -->
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover grayscale opacity-40" data-alt="Modern minimalist digital map interface showing San Francisco city grid with subtle blue navigation lines and soft grey terrain" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvcdf53u5ZUIT7sV1AHOEAhLxbpducmFKSLauqMBFN7oRXPOM5Gd4j_bqN2c5zA4K2iB5B-TLrTSf7EuDuhzLMpwIaW4rxNCTfRtfOG8f51qnOxajpLwV2_eSIvt8FgNjjT7XhhvNkDXdO8phA1zCr3AtcTr-bBuAFnbGcs75FjIx6_Xd5znMvUGEnq5tvLPqIMdmvtnF4tKIdV9Q1jdLjax63pphoI3UXIks8MRT1HgSxR039yglM_-UQ5ZaYFUHqtdtqlxcdPlQ"/>
+</div>
+<!-- Standby Status Badge -->
+<div class="absolute top-24 left-1/2 -translate-x-1/2 z-10">
+<div class="bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg flex items-center gap-3 border border-white/20">
+<div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+<span class="font-headline font-bold text-sm tracking-tight">WAITING FOR REQUESTS</span>
+</div>
+</div>
+<!-- NEW RIDE REQUEST POPUP (Slide-up Panel) -->
+<section class="absolute inset-x-0 bottom-0 z-[60] px-4 pb-24 md:pb-8 flex justify-center">
+<div class="w-full max-w-md bg-white rounded-t-[2.5rem] shadow-[0_-20px_60px_rgba(0,0,0,0.15)] overflow-hidden">
+<!-- Urgent Header -->
+<div class="p-6 flex justify-between items-center bg-[#0052FF]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined font-black text-white" data-icon="priority_high">priority_high</span>
+<h2 class="font-headline text-xl font-extrabold tracking-tight text-white">New Ride Available!</h2>
+</div>
+<button class="p-1">
+<span class="material-symbols-outlined text-white" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+</div>
+<!-- Content Body -->
+<div class="p-6 space-y-6">
+<!-- User Info Block -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="relative">
+<img class="w-16 h-16 rounded-2xl object-cover" data-alt="professional headshot of a smiling young woman with warm expression, outdoor natural lighting, soft blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKCnoHwmbHVhv0CUCVjzQrmhPDZ-jwnu7f8wPaYTfI9Zm7uJsXpsvlGi4sF5NZtqiumgSnHK2LcytsfxyLGJ2XJ7zhWahjkU2Wt0b_lt4TKengEKHk2bIwWG6AuuQgvgY63l8MOj1GMpGNt7TycmkL0y-F2SkfvlwLFBo7MSIdZZzAbbdHctqvf96yyV_y_ap12xSzYI5hdqL-cOaNqJKoShHilB_mkN2p4gTNdgx5CYbwz2A3rvd8rf_tIDEpwrKto-r1yWZBhlc"/>
+<div class="absolute -bottom-1 -right-1 bg-primary text-on-primary w-6 h-6 rounded-lg flex items-center justify-center border-2 border-white">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold leading-tight">Sarah Jenkins</h3>
+<p class="text-on-surface-variant text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="near_me">near_me</span>
+                                    1.2 KM away
+                                </p>
+</div>
+</div>
+<div class="bg-surface-container-low px-4 py-2 rounded-xl text-center">
+<span class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rating</span>
+<span class="font-headline font-black text-lg">4.92</span>
+</div>
+</div>
+<!-- Ride Mode Info -->
+<div class="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-start gap-4">
+<div class="bg-primary text-white p-2 rounded-xl bg-[#0052FF]">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-primary text-[#0052FF]">Urgent Mode</h4>
+<p class="text-xs text-on-surface-variant">Passenger requested expedited pickup for flight departure.</p>
+</div>
+</div>
+<!-- Details List (Editorial Tonal Stacking) -->
+<div class="space-y-4">
+<!-- Pickup -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-primary ring-4 ring-primary/10"></div>
+<div class="w-[2px] h-full bg-surface-container-highest my-1"></div>
+</div>
+<div class="pb-2">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Pickup</p>
+<p class="font-headline font-bold text-base">101 Market St, San Francisco</p>
+</div>
+</div>
+<!-- Destination -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded bg-inverse-surface"></div>
+</div>
+<div>
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Destination</p>
+<p class="font-headline font-bold text-base">SFO Terminal 2</p>
+</div>
+</div>
+</div>
+<!-- Fare & Payment Info -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-low p-4 rounded-2xl">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">Fare Estimate</p>
+<p class="font-headline text-2xl font-black text-primary">$24.50</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-2xl">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">Payment</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="credit_card">credit_card</span>
+<span class="font-headline font-bold">Card</span>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="grid grid-cols-2 gap-3 pt-2">
+<button class="col-span-2 bg-surface-container-high text-on-surface font-headline font-bold py-4 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+                            Get Distance
+                        </button>
+<button class="bg-slate-200 text-on-surface-variant font-headline font-bold py-4 rounded-2xl active:scale-95 transition-transform">
+                            Ignore
+                        </button>
+<button class="bg-gradient-to-br from-[#00c853] to-[#00a343] text-white font-headline font-black text-lg py-4 rounded-2xl shadow-lg shadow-green-500/20 active:scale-95 transition-transform">
+                            Accept
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Contextually relevant for Captain dashboard) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl z-50 rounded-t-[2rem] shadow-[0_-12px_40px_rgba(0,0,0,0.08)] md:hidden">
+<a class="flex flex-col items-center justify-center bg-[#0052FF]/10 dark:bg-[#0052FF]/20 text-[#0052FF] dark:text-[#829bff] rounded-2xl px-5 py-2 scale-110 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="sensors">sensors</span>
+<span class="font-manrope text-[10px] font-semibold uppercase tracking-wider">Go Online</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-manrope text-[10px] font-semibold uppercase tracking-wider">Earnings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-manrope text-[10px] font-semibold uppercase tracking-wider">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-manrope text-[10px] font-semibold uppercase tracking-wider">Profile</span>
+</a>
+</nav>
+</body></html>

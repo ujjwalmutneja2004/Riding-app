@@ -81,10 +81,10 @@ const rideSchema=new mongoose.Schema({
      enum: ["cash", "card"],
    },
    paymentStatus: {
-  type: String,
-  enum: ["pending", "paid"],
-  },
+    type: String,
+    enum: ["pending", "paid"],
+   },
       
-})
+}, { timestamps: true });
 
-module.exports= mongoose.model('ride',rideSchema);
+module.exports = mongoose.model('ride', rideSchema);

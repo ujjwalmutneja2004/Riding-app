@@ -223,11 +223,19 @@ module.exports.startRide=async ({rideId,otp,captain})=>{
     }
 
 module.exports.getCaptainEarningsService = async (captainId) => {
+        // Calculate the beginning of today in ObjectId timestamp
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const startObjectId = new mongoose.Types.ObjectId(
+            Math.floor(startOfDay.getTime() / 1000).toString(16) + "0000000000000000"
+        );
+
         const completedRides = await rideModel.aggregate([
             {
                 $match: {
                     captain: new mongoose.Types.ObjectId(captainId),
-                    status: 'completed'
+                    status: 'completed',
+                    _id: { $gte: startObjectId }
                 }
             },
             {

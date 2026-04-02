@@ -189,7 +189,7 @@ const getColor = (name) => {
                         >
                             Finish Ride
                         </button>
-                        <p className='mt-10 text-xs'>Click on Finish Ride Button if you have Completed the Payment</p>
+                        
                    
                 </div>
             </div>
