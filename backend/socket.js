@@ -32,7 +32,7 @@ function initializeSocket(server) {
 
         
       } else if (userType === "captain") {
-        await captainModel.findByIdAndUpdate(userId, { socketId: socket.id, isAvailable: true });
+        await captainModel.findByIdAndUpdate(userId, { socketId: socket.id });
         console.log(`Captain ${userId} joined with socket ${socket.id} and userType ${userType}`);
       }
     });

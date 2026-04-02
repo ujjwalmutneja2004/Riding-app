@@ -49,6 +49,12 @@ router.post('/:id/rate',
     rideController.rateRide
 );
 
+router.post('/cancel-ride-captain',
+    authMiddleware.authCaptain,
+    body('rideId').isMongoId().withMessage('Invalid ride id'),
+    rideController.cancelRideByCaptain
+);
+
 router.get('/:captainId/earnings',getCaptainEarnings);
 
 

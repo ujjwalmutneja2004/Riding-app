@@ -56,18 +56,38 @@ const [fare,setFare]=useState({})
  },[user])
 
 
-  socket.on("ride-confirmed", ride=> {
-    console.log("Ride confirmed and confirmation received to user:", ride);
-    setWaitingForDriver(true);
-    setVehicleFound(false);
-    setRide(ride);
-  })
+  useEffect(() => {
+    const handleRideConfirmed = (ride) => {
+      console.log("Ride confirmed and confirmation received to user:", ride);
+      setWaitingForDriver(true);
+      setVehicleFound(false);
+      setRide(ride);
+    };
 
-  socket.on('ride-started', ride => {
-    setWaitingForDriver(false);
-    navigate('/riding',{state:{ride}})
-  } )
+    const handleRideCancelled = () => {
+      console.log("Ride cancelled by captain");
+      alert("The captain has cancelled the ride. Looking for another driver...");
+      setWaitingForDriver(false);
+      setVehicleFound(true);
+      setRide(null);
+      createRide(); // Auto-restart the search for a new ride
+    };
 
+    const handleRideStarted = (ride) => {
+      setWaitingForDriver(false);
+      navigate('/riding',{state:{ride}});
+    };
+
+    socket.on("ride-confirmed", handleRideConfirmed);
+    socket.on("ride-cancelled-by-captain", handleRideCancelled);
+    socket.on('ride-started', handleRideStarted);
+
+    return () => {
+      socket.off("ride-confirmed", handleRideConfirmed);
+      socket.off("ride-cancelled-by-captain", handleRideCancelled);
+      socket.off('ride-started', handleRideStarted);
+    };
+  }, [socket, navigate, pickup, destination, vehicleType, rideMode]); 
   const submitHandler = (e) => {
     e.preventDefault();
   };

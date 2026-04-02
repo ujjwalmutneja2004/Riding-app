@@ -44,7 +44,7 @@ const CaptainDashboard = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white p-4 rounded-xl shadow border-l-4 border-green-500">
               <h4 className="text-sm text-gray-500 font-medium">Lifetime Earnings</h4>
-              <p className="text-2xl font-bold text-green-600">₹{Math.round(data.lifetimeEarnings)}</p>
+              <p className="text-2xl font-bold text-green-600">₹{data.lifetimeEarnings.toFixed(2)}</p>
             </div>
             <div className="bg-white p-4 rounded-xl shadow border-l-4 border-blue-500">
               <h4 className="text-sm text-gray-500 font-medium">Total Rides</h4>
@@ -75,8 +75,11 @@ const CaptainDashboard = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.chartData}>
                   <XAxis dataKey="name" fontSize={12} />
-                  <YAxis fontSize={12} width={40} />
-                  <Tooltip cursor={{fill: 'transparent'}} />
+                  <YAxis fontSize={12} width={40} tickFormatter={(value) => Math.round(value)} />
+                  <Tooltip 
+                    cursor={{fill: 'transparent'}} 
+                    formatter={(value) => [Math.round(value), "Earnings"]}
+                  />
                   <Bar dataKey="earnings" fill="#10B981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

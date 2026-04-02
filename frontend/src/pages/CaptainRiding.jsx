@@ -221,11 +221,11 @@ const CaptainRiding = () => {
     if (!socket) return;
 
     const handlePaymentSuccess = (data) => {
-      alert(`Payment of ₹${data.amount} received from user!`);
+      alert(`Payment of ₹${Math.round(data.amount)} received from user!`);
     };
 
      const handleCashPaymentSelected = (data) => {
-    alert(`💵 Customer will pay ₹${data.amount} in cash`);
+    alert(`💵 Customer will pay ₹${Math.round(data.amount)} in cash`);
   };
 
 
