@@ -11,6 +11,7 @@ import { CaptainDataContext } from '../context/CaptainContext';
 import WalletHistoryDrawer from '../components/WalletHistoryDrawer';
 import logo from '../assets/logoo.png';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const CaptainHome = () => {
   const navigate = useNavigate();
@@ -25,8 +26,49 @@ const CaptainHome = () => {
   const walletHistoryPanelRef = useRef(null);
 
   const { socket } = useContext(SocketContext);
-  const { captain } = useContext(CaptainDataContext);
+  const { captain, setCaptain } = useContext(CaptainDataContext);
   const [ride, setRide] = useState(null);
+  const [isOnline, setIsOnline] = useState(captain?.isAvailable || false);
+  const isOnlineRef = useRef(isOnline);
+
+  useEffect(() => {
+    isOnlineRef.current = isOnline;
+  }, [isOnline]);
+
+  useEffect(() => {
+    if (captain) {
+      setIsOnline(captain.isAvailable);
+    }
+  }, [captain]);
+
+  const toggleOnlineStatus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error("Authentication token missing");
+        return;
+      }
+
+      const response = await axios.patch(`${import.meta.env.VITE_BASE_URL}/captains/toggle-status`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      const newStatus = response.data.isAvailable;
+      setIsOnline(newStatus);
+      
+      if (setCaptain) {
+        setCaptain(prev => ({ ...prev, isAvailable: newStatus }));
+      }
+
+      toast.success(`You are now ${newStatus ? 'Online' : 'Offline'}`);
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      const errorDetail = error.response?.data?.message || error.message || "Unknown error occurred";
+      toast.error(`Failed to update status: ${errorDetail}`);
+    }
+  };
 
   useEffect(() => {
     if (!captain?._id) return;
@@ -64,13 +106,35 @@ const CaptainHome = () => {
     updateLocation();
     const locationInterval = setInterval(updateLocation, 10000);
 
-    return () => clearInterval(locationInterval);
-  }, [captain, socket]);
+    const handleNewRide = (data) => {
+      if (isOnlineRef.current) {
+        setRide(data);
+        setRidePopupPanel(true);
+      }
+    };
 
-  socket.on('new-ride', (data) => {
-    setRide(data);
-    setRidePopupPanel(true);
-  });
+    const handleRideAcceptedElsewhere = (data) => {
+      // If the currently shown ride is accepted by someone else, close the popup
+      setRide(currentRide => {
+        if (currentRide && currentRide._id === data.rideId) {
+          setRidePopupPanel(false);
+          toast.info("This ride was accepted by another captain.");
+          return null; // clear ride
+        }
+        return currentRide;
+      });
+    };
+
+    socket.on('new-ride', handleNewRide);
+    socket.on('ride-accepted-elsewhere', handleRideAcceptedElsewhere);
+
+    return () => {
+      clearInterval(locationInterval);
+      socket.off('new-ride', handleNewRide);
+      socket.off('ride-accepted-elsewhere', handleRideAcceptedElsewhere);
+    };
+
+  }, [captain, socket]);
 
   async function confirmRide() {
     await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm-ride`, {
@@ -116,10 +180,23 @@ const CaptainHome = () => {
   );
 
   useGSAP(function () {
+    const modalContent = walletHistoryPanelRef.current?.querySelector('.modal-content');
     if (walletHistoryPanel) {
-      gsap.to(walletHistoryPanelRef.current, { transform: "translateY(0)" });
+      gsap.to(modalContent, { 
+        scale: 1, 
+        opacity: 1,
+        duration: 0.4,
+        ease: "back.out(1.7)",
+        pointerEvents: 'auto'
+      });
     } else {
-      gsap.to(walletHistoryPanelRef.current, { transform: "translateY(100%)" });
+      gsap.to(modalContent, { 
+        scale: 0.9, 
+        opacity: 0,
+        duration: 0.2,
+        ease: "power2.in",
+        pointerEvents: 'none'
+      });
     }
   }, [walletHistoryPanel]);
 
@@ -143,6 +220,9 @@ const CaptainHome = () => {
       }
     } catch (error) {
       console.error('Error logging out:', error.response?.data || error.message);
+    } finally {
+      localStorage.removeItem('token');
+      navigate('/captain-login');
     }
   };
 
@@ -189,7 +269,10 @@ const CaptainHome = () => {
 
         {/* Floating HUD elements */}
         <div className="absolute top-20 right-6 flex flex-col gap-3">
-          <button className="h-12 w-12 bg-surface-container-lowest/90 backdrop-blur-md rounded-2xl shadow-lg flex items-center justify-center text-on-surface hover:bg-white transition-all active:scale-95">
+          <button 
+            onClick={() => toast.info("Map recentered to your current location")}
+            className="h-12 w-12 bg-surface-container-lowest/90 backdrop-blur-md rounded-2xl shadow-lg flex items-center justify-center text-on-surface hover:bg-white transition-all active:scale-95 shadow-primary/10"
+          >
             <i className="ri-focus-3-line text-xl"></i>
           </button>
           <button className="h-12 w-12 bg-surface-container-lowest/90 backdrop-blur-md rounded-2xl shadow-lg flex items-center justify-center text-on-surface hover:bg-white transition-all active:scale-95">
@@ -205,9 +288,12 @@ const CaptainHome = () => {
 
       {/* BottomNavBar */}
       <nav className="fixed bottom-0 left-0 w-full z-10 bg-white/90 backdrop-blur-2xl rounded-t-[2rem] shadow-[0_-12px_40px_rgba(0,0,0,0.08)] flex justify-around items-center px-4 pt-3 pb-6">
-        <div className="flex flex-col items-center justify-center bg-[#0052FF]/10 text-[#0052FF] rounded-2xl px-5 py-2 scale-110 transition-all duration-300 ease-out cursor-pointer">
-          <i className="ri-broadcast-line text-xl mb-1"></i>
-          <span className="font-manrope text-[10px] font-semibold uppercase tracking-wider">Go Online</span>
+        <div 
+          onClick={toggleOnlineStatus}
+          className={`flex flex-col items-center justify-center rounded-2xl px-5 py-2 scale-110 transition-all duration-300 ease-out cursor-pointer ${isOnline ? 'bg-green-500/10 text-green-600' : 'bg-slate-100 text-slate-400'}`}
+        >
+          <i className={`ri-${isOnline ? 'broadcast-line' : 'shut-down-line'} text-xl mb-1`}></i>
+          <span className="font-manrope text-[10px] font-semibold uppercase tracking-wider">{isOnline ? 'Online' : 'Go Online'}</span>
         </div>
         <div onClick={() => navigate('/captain-dashboard')} className="flex flex-col items-center justify-center text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity cursor-pointer">
           <i className="ri-wallet-3-line text-xl mb-1"></i>
@@ -217,7 +303,7 @@ const CaptainHome = () => {
           <i className="ri-bar-chart-box-line text-xl mb-1"></i>
           <span className="font-manrope text-[10px] font-semibold uppercase tracking-wider">Insights</span>
         </div>
-        <div className="flex flex-col items-center justify-center text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity cursor-pointer">
+        <div onClick={() => navigate('/captain-profile')} className="flex flex-col items-center justify-center text-slate-400 px-5 py-2 hover:opacity-80 transition-opacity cursor-pointer">
           <i className="ri-user-line text-xl mb-1"></i>
           <span className="font-manrope text-[10px] font-semibold uppercase tracking-wider">Profile</span>
         </div>
@@ -263,15 +349,12 @@ const CaptainHome = () => {
         </div>
       </div>
 
-      {/* Wallet History Drawer */}
+      {/* Wallet History Modal */}
       <div
           ref={walletHistoryPanelRef}
-          className="fixed w-full max-w-md left-1/2 -translate-x-1/2 h-[85vh] z-50 bottom-0 translate-y-full bg-white px-8 py-10 rounded-t-[3rem] shadow-[0_-20px_100px_rgba(0,0,0,0.15)] pointer-events-auto flex flex-col"
+          className={`fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none transition-all duration-300 ${walletHistoryPanel ? 'visible' : 'invisible'}`}
       >
-          <div className="w-full text-center mb-4">
-              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto cursor-pointer" onClick={() => setWalletHistoryPanel(false)}></div>
-          </div>
-          <div className="flex-1 overflow-y-auto w-full">
+          <div className="modal-content w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl pointer-events-auto max-h-[85vh] flex flex-col opacity-0 scale-90 overflow-hidden">
             <WalletHistoryDrawer isOpen={walletHistoryPanel} onClose={() => setWalletHistoryPanel(false)} />
           </div>
       </div>

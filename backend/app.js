@@ -35,7 +35,7 @@ app.use(cors({
     "https://travelx-five.vercel.app",
     "https://riding-app.onrender.com"
   ], // Explicit frontend URL
-  methods: "GET,POST,PUT,DELETE",
+  methods: "GET,POST,PUT,DELETE,PATCH",
   allowedHeaders: "Content-Type,Authorization",
   credentials: true // Set this to false if not using cookies
 }));

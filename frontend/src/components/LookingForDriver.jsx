@@ -46,12 +46,17 @@ const LookingForDriver = ({ createRide,pickup,destination,fare,vehicleType, setV
                             <p className='text-sm mt-1 text-gray-600'>Cash\Card</p>
                         </div>
                     </div>
-
-
-
                 </div>
+
+                <button 
+                  onClick={() => setVehicleFound(false)} 
+                  className="w-full mt-5 bg-red-600 text-white font-semibold py-3 rounded-lg"
+                >
+                  Cancel Request
+                </button>
             </div>
         </div>
+
     )
 }
 

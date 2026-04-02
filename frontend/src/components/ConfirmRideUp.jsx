@@ -5,75 +5,89 @@ import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 
 const ConfirmRidePopUp = (props) => {
-  const [otp,setOtp] = useState('');
+  const [otp, setOtp] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const ride = location.state?.ride;
 
-
-  
-      const [distance, setDistance] = useState(null);
-  
-      // Function to calculate distance between captain's current location and destination
-      // Function to calculate distance between captain's current location and destination
-      const calculateDistance = async () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const currentLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    };
-    
-                    const originLat = currentLocation.lat;
-                    const originLng = currentLocation.lng;
-                    const destLat = Number(props.ride?.destLat);  // Ensure it's a number
-                    const destLng = Number(props.ride?.destLng);  // Ensure it's a number
-    
-                    // Check if any coordinates are missing
-                    if (!originLat || !originLng || !destLat || !destLng) {
-                        console.error('❌ Missing coordinates:', { originLat, originLng, destLat, destLng });
-                        return; // Prevent further execution if coordinates are missing
-                    }
-    
-                    try {
-                        const token = localStorage.getItem("token"); // replace if token stored differently
-    
-                        const response = await axios.get(
-                            `${import.meta.env.VITE_BASE_URL}/maps/getdistby`,
-                            {
-                                params: { originLat, originLng, destLat, destLng },
-                                headers: {
-                                    Authorization: `Bearer ${token}`,
-                                },
-                            }
-                        );
-    
-                        console.log("Distance response:", response.data);
-    
-                        if (response.data && response.data.distance && response.data.time) {
-                            setDistance(response.data.distance);
-                        }
-                    } catch (error) {
-                        console.error('Error Response:', error.response);
-                        console.log("Current Location:", currentLocation.lat, currentLocation.lng);
-                        console.log("Destination Coordinates:", props.ride?.destLat, props.ride?.destLng);
-                        console.error('🔥 Error while calling /get-distance-time:', {
-                            message: error.message,
-                            status: error.response?.status,
-                            data: error.response?.data,
-                        });
-                    }
-                },
-                (error) => {
-                    console.error('❌ Error getting current location:', error);
-                }
-            );
-        } else {
-            console.error('❌ Geolocation is not supported by this browser.');
+  const cancelRide = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/cancel-ride-captain`, {
+        rideId: props.ride._id
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-    };
-  
+      });
+      props.setConfirmRidePopupPanel(false);
+      props.setRidePopupPanel(false);
+    } catch (error) {
+      console.error("Error cancelling ride:", error);
+    }
+  };
+
+  const [distance, setDistance] = useState(null);
+
+  // Function to calculate distance between captain's current location and destination
+  // Function to calculate distance between captain's current location and destination
+  const calculateDistance = async () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const currentLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+
+          const originLat = currentLocation.lat;
+          const originLng = currentLocation.lng;
+          const destLat = Number(props.ride?.destLat);  // Ensure it's a number
+          const destLng = Number(props.ride?.destLng);  // Ensure it's a number
+
+          // Check if any coordinates are missing
+          if (!originLat || !originLng || !destLat || !destLng) {
+            console.error('❌ Missing coordinates:', { originLat, originLng, destLat, destLng });
+            return; // Prevent further execution if coordinates are missing
+          }
+
+          try {
+            const token = localStorage.getItem("token"); // replace if token stored differently
+
+            const response = await axios.get(
+              `${import.meta.env.VITE_BASE_URL}/maps/getdistby`,
+              {
+                params: { originLat, originLng, destLat, destLng },
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            console.log("Distance response:", response.data);
+
+            if (response.data && response.data.distance && response.data.time) {
+              setDistance(response.data.distance);
+            }
+          } catch (error) {
+            console.error('Error Response:', error.response);
+            console.log("Current Location:", currentLocation.lat, currentLocation.lng);
+            console.log("Destination Coordinates:", props.ride?.destLat, props.ride?.destLng);
+            console.error('🔥 Error while calling /get-distance-time:', {
+              message: error.message,
+              status: error.response?.status,
+              data: error.response?.data,
+            });
+          }
+        },
+        (error) => {
+          console.error('❌ Error getting current location:', error);
+        }
+      );
+    } else {
+      console.error('❌ Geolocation is not supported by this browser.');
+    }
+  };
+
 
 
 
@@ -97,11 +111,11 @@ const ConfirmRidePopUp = (props) => {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-  
+
       if (response.status === 200) {
         props.setConfirmRidePopupPanel(false);
         props.setRidePopupPanel(false);
-        navigate('/captain-riding',{state:{ride:props.ride}});
+        navigate('/captain-riding', { state: { ride: props.ride } });
       }
     } catch (error) {
       console.error('Start ride failed:', error.response?.data || error.message);
@@ -110,18 +124,18 @@ const ConfirmRidePopUp = (props) => {
   };
 
   const getInitials = (user) => {
-  const first = user?.fullname?.firstname?.[0] || "";
-  const last = user?.fullname?.lastname?.[0] || "";
-  return (first + last).toUpperCase();
-};
+    const first = user?.fullname?.firstname?.[0] || "";
+    const last = user?.fullname?.lastname?.[0] || "";
+    return (first + last).toUpperCase();
+  };
 
-const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-purple-500"];
+  const colors = ["bg-red-500", "bg-blue-500", "bg-green-500", "bg-purple-500"];
 
-const getColor = (name) => {
-  if (!name) return "bg-gray-400";
-  const index = name.charCodeAt(0) % colors.length;
-  return colors[index];
-};
+  const getColor = (name) => {
+    if (!name) return "bg-gray-400";
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
+  };
 
 
   return (
@@ -132,7 +146,7 @@ const getColor = (name) => {
           <i className="ri-shield-check-fill text-[#0052FF] text-2xl"></i>
           <h2 className="font-headline text-xl font-extrabold tracking-tight text-on-surface">Confirm Route</h2>
         </div>
-        <button 
+        <button
           onClick={() => props.setConfirmRidePopupPanel(false)}
           className="p-2 bg-surface-container-high rounded-full active:scale-95 transition-transform"
         >
@@ -145,18 +159,18 @@ const getColor = (name) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <img 
-                className="w-16 h-16 rounded-2xl object-cover" 
-                alt="user profile" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKCnoHwmbHVhv0CUCVjzQrmhPDZ-jwnu7f8wPaYTfI9Zm7uJsXpsvlGi4sF5NZtqiumgSnHK2LcytsfxyLGJ2XJ7zhWahjkU2Wt0b_lt4TKengEKHk2bIwWG6AuuQgvgY63l8MOj1GMpGNt7TycmkL0y-F2SkfvlwLFBo7MSIdZZzAbbdHctqvf96yyV_y_ap12xSzYI5hdqL-cOaNqJKoShHilB_mkN2p4gTNdgx5CYbwz2A3rvd8rf_tIDEpwrKto-r1yWZBhlc"
-              />
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border-2 border-surface-container-high shadow-lg">
+                <span className="text-primary font-black text-2xl uppercase">
+                  {props.ride?.user?.fullname?.firstname?.charAt(0) || 'U'}
+                </span>
+              </div>
               <div className="absolute -bottom-1 -right-1 bg-primary text-on-primary w-6 h-6 rounded-lg flex items-center justify-center border-2 border-white">
                 <i className="ri-star-fill text-[14px]"></i>
               </div>
             </div>
             <div>
               <h3 className="font-headline text-lg font-bold leading-tight capitalize">
-                 {props.ride?.user?.fullname?.firstname}
+                {props.ride?.user?.fullname?.firstname}
               </h3>
               <p className="text-on-surface-variant text-sm flex items-center gap-1 font-medium mt-1">
                 <i className="ri-map-pin-user-fill text-sm text-primary"></i>
@@ -164,7 +178,7 @@ const getColor = (name) => {
               </p>
             </div>
           </div>
-          <button 
+          <button
             type="button"
             onClick={calculateDistance}
             className="bg-primary/10 text-primary p-3 rounded-2xl active:scale-95 transition-transform"
@@ -182,9 +196,9 @@ const getColor = (name) => {
             <div>
               <h4 className="font-headline font-bold text-[#0052FF]">{props.ride.rideMode}</h4>
               <p className="text-xs text-on-surface-variant mt-1">
-                 {props.ride.rideMode === 'Work Mode' ? 'Silent ride, shortest route.' : 
-                  props.ride.rideMode === 'Chill Mode' ? 'Music allowed, casual conversation.' : 
-                  props.ride.rideMode === 'Urgent Mode' ? 'Fastest route, priority driver.' : ''}
+                {props.ride.rideMode === 'Work Mode' ? 'Silent ride, shortest route.' :
+                  props.ride.rideMode === 'Chill Mode' ? 'Music allowed, casual conversation.' :
+                    props.ride.rideMode === 'Urgent Mode' ? 'Fastest route, priority driver.' : ''}
               </p>
             </div>
           </div>
@@ -202,7 +216,7 @@ const getColor = (name) => {
               <p className="font-headline font-bold text-base line-clamp-2">{props.ride?.pickup}</p>
             </div>
           </div>
-          
+
           <div className="flex gap-4">
             <div className="flex flex-col items-center">
               <div className="w-3 h-3 rounded bg-inverse-surface mt-1"></div>
@@ -235,15 +249,15 @@ const getColor = (name) => {
         <form onSubmit={submitHandler} className="space-y-5">
           <div className="space-y-2">
             <label className="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant ml-2 flex items-center gap-1">
-               <i className="ri-shield-keyhole-line text-sm border-r border-surface-container-highest pr-1"></i>
-               Passenger PIN
+              <i className="ri-shield-keyhole-line text-sm border-r border-surface-container-highest pr-1"></i>
+              Passenger PIN
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
                 <i className="ri-lock-password-fill text-surface-container-highest text-xl" />
               </div>
-              <input 
-                value={otp} 
+              <input
+                value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 type="text"
                 placeholder="---"
@@ -252,17 +266,14 @@ const getColor = (name) => {
               />
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => {
-                props.setConfirmRidePopupPanel(false);
-                props.setRidePopupPanel(false);
-              }}
+              onClick={cancelRide}
               className="bg-red-50 text-red-600 font-headline font-bold py-4 rounded-2xl active:scale-95 transition-transform"
             >
-              Cancel 
+              Cancel
             </button>
             <button
               type="submit"
