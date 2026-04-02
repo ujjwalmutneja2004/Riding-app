@@ -81,10 +81,31 @@ const rideSchema=new mongoose.Schema({
      enum: ["cash", "card"],
    },
    paymentStatus: {
-    type: String,
-    enum: ["pending", "paid"],
-   },
+  type: String,
+  enum: ["pending", "paid"],
+  },
+  createdAtIST: {
+    type: String
+  }
       
 }, { timestamps: true });
+
+rideSchema.pre('save', function (next) {
+    if (this.isNew) {
+        const date = new Date();
+        const options = { 
+            timeZone: 'Asia/Kolkata', 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+        };
+        this.createdAtIST = date.toLocaleString('en-IN', options);
+    }
+    next();
+});
 
 module.exports = mongoose.model('ride', rideSchema);

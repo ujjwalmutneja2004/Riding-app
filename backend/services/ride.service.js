@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const rideModel= require('../models/ride.model');
+const captainModel = require('../models/captain.model');
+const CompanyWallet = require('../models/companyWallet.model');
 const mapService=require('./maps.service');
 const crypto=require('crypto');
 const { sendMessageToSocketId } = require('../socket'); // ✅ Add this in ride.service.js
@@ -192,12 +194,12 @@ module.exports.startRide=async ({rideId,otp,captain})=>{
             throw new Error('Ride ID is required to end a ride.');
         }
 
-        //ride document me captain update kardo and status accepted kardo
+        // Fetch ride with captain data
         const ride=await rideModel.findOne({
             _id:rideId,
-            //kya jo ride me captain ha wo hi captain ha jo ride end kar raha ha meanns jisna start ki thi
             captain:captain._id
-        }).populate('user').populate('captain').select('+otp');
+        }).populate('user').populate('captain');
+
         if (!ride) {
             throw new Error('Ride not found.');
         }
@@ -206,12 +208,57 @@ module.exports.startRide=async ({rideId,otp,captain})=>{
             throw new Error('Ride is not ongoing.');
         }
 
-        await rideModel.findOneAndUpdate({
-            _id:rideId
-        },
-        {
-            status:'completed',
-        })
+        // COMMISSION LOGIC
+        const commissionRate = parseFloat(process.env.COMMISSION_RATE) || 0.20; // Default 20%
+        const fare = ride.fare;
+        const commission = fare * commissionRate;
+        const captainShare = fare - commission;
+
+        // WALLET UPDATES (Sequential for simplicity, ideally in a transaction)
+        try {
+            if (ride.paymentMode === 'card' || ride.paymentMode === 'online') {
+                // Online Payment: Rider pays company. Company owes captain (fare - commission)
+                await captainModel.findByIdAndUpdate(captain._id, {
+                    $inc: { 
+                        wallet: captainShare,
+                        totalEarnings: captainShare
+                    }
+                });
+            } else {
+                // Cash Payment: Rider pays captain. Captain keeps full amount.
+                // Captain owes company the commission.
+                await captainModel.findByIdAndUpdate(captain._id, {
+                    $inc: { 
+                        wallet: -commission,
+                        totalEarnings: captainShare
+                    }
+                });
+            }
+
+            // Update Company Wallet
+            const companyWallet = await CompanyWallet.getWallet();
+            await CompanyWallet.findByIdAndUpdate(companyWallet._id, {
+                $inc: { 
+                    totalBalance: commission,
+                    totalCommissionEarned: commission,
+                    totalRidesHandled: 1
+                }
+            });
+
+            // Update Ride Status
+            await rideModel.findOneAndUpdate({
+                _id:rideId
+            },
+            {
+                status:'completed',
+                paymentStatus: 'paid'
+            });
+
+        } catch (error) {
+            console.error("❌ Error updating wallets during endRide:", error);
+            throw new Error("Failed to process payments/wallets during ride completion.");
+        }
+
             console.log("end ride socket sended")
             sendMessageToSocketId(ride.user.socketId, {
                 event: 'ride-ended',

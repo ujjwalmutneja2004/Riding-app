@@ -99,6 +99,14 @@ const captainSchema=new mongoose.Schema({
         averageRating: {
             type: Number,
             default: 0
+        },
+        wallet: {
+            type: Number,
+            default: 0
+        },
+        totalEarnings: {
+            type: Number,
+            default: 0
         }
     }
 )

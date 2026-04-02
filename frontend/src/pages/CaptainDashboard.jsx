@@ -44,7 +44,7 @@ const CaptainDashboard = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white p-4 rounded-xl shadow border-l-4 border-green-500">
               <h4 className="text-sm text-gray-500 font-medium">Lifetime Earnings</h4>
-              <p className="text-2xl font-bold text-green-600">₹{Math.round(data.lifetimeEarnings)}</p>
+              <p className="text-2xl font-bold text-green-600">₹{data.lifetimeEarnings.toFixed(2)}</p>
             </div>
             <div className="bg-white p-4 rounded-xl shadow border-l-4 border-blue-500">
               <h4 className="text-sm text-gray-500 font-medium">Total Rides</h4>

@@ -53,5 +53,10 @@ router.get('/history', authMiddleware.authCaptain, authMiddleware.isApproved, ca
 
 router.get('/analytics', authMiddleware.authCaptain, authMiddleware.isApproved, captainController.getCaptainAnalytics)
 
+router.get('/wallet-status', authMiddleware.authCaptain, captainController.getCaptainWalletStatus);
+router.post('/cashout', authMiddleware.authCaptain, captainController.handleCashout);
+router.post('/settle-wallet', authMiddleware.authCaptain, captainController.handleSettlement);
+router.get('/settlement-history', authMiddleware.authCaptain, captainController.getSettlementHistory);
+
 router.post('/logout', authMiddleware.authCaptain, captainController.logoutCaptain);
 module.exports = router;

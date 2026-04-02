@@ -23,6 +23,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminApprovalQueue from "./pages/AdminApprovalQueue";
 import AdminLogin from "./pages/AdminLogin";
 import AdminProtectWrapper from "./pages/AdminProtectWrapper";
+import AdminCaptains from "./pages/AdminCaptains";
+import AdminCaptainDetails from "./pages/AdminCaptainDetails";
 
 const App = () => {
   return (
@@ -94,6 +96,16 @@ const App = () => {
         <Route path='/admin/approvals' element={
           <AdminProtectWrapper>
             <AdminApprovalQueue />
+          </AdminProtectWrapper>
+        } />
+        <Route path='/admin/captains' element={
+          <AdminProtectWrapper>
+            <AdminCaptains />
+          </AdminProtectWrapper>
+        } />
+        <Route path='/admin/captain/:id' element={
+          <AdminProtectWrapper>
+            <AdminCaptainDetails />
           </AdminProtectWrapper>
         } />
 

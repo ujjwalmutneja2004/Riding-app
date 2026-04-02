@@ -1,6 +1,4 @@
-
-import React from 'react';
-import { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CaptainDetails from '../components/CaptainDetails';
 import RidePopUp from '../components/RidePopUp';
@@ -10,8 +8,8 @@ import ConfirmRidePopUp from '../components/ConfirmRideUp';
 import { Link } from 'react-router-dom';
 import { SocketContext } from '../context/SocketContext'
 import { CaptainDataContext } from '../context/CaptainContext';
+import WalletHistoryDrawer from '../components/WalletHistoryDrawer';
 import logo from '../assets/logoo.png';
-
 import axios from 'axios';
 
 const CaptainHome = () => {
@@ -19,110 +17,33 @@ const CaptainHome = () => {
 
   const [ridePopupPanel, setRidePopupPanel] = useState(false);
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
+  const [walletHistoryPanel, setWalletHistoryPanel] = useState(false);
   const [captainLocation, setCaptainLocation] = useState(null);
 
-
   const ridePopupPanelRef = useRef(null);
-  const confirmRidePopupPanelRef = useRef(null)
+  const confirmRidePopupPanelRef = useRef(null);
+  const walletHistoryPanelRef = useRef(null);
 
   const { socket } = useContext(SocketContext);
   const { captain } = useContext(CaptainDataContext);
   const [ride, setRide] = useState(null);
-  console.log("captainaagya" + captain)
-
-
-  // useEffect(() => {
-  //   socket.emit('join', {
-  //     userId: captain._id,
-  //     userType: 'captain'
-  //   });
-
-  //   const updateLocation = () => {
-  //     if (navigator.geolocation) {
-  //       console.log("📍 Trying to get current location...");
-
-  //       navigator.geolocation.getCurrentPosition(
-  //         (position) => {
-  //           console.log("✅ Location fetched:", {
-  //             lat: position.coords.latitude,
-  //             lng: position.coords.longitude,
-  //             accuracy: position.coords.accuracy + " meters"
-  //           });
-
-
-  //             // Update captainLocation state with the new location
-  //             setCaptainLocation({
-  //               lat: position.coords.latitude,
-  //               lng: position.coords.longitude,
-  //           });
-
-  //           socket.emit('update-location-captain', {
-  //             userId: captain._id,
-  //             location: {
-  //               lat: position.coords.latitude,
-  //               lng: position.coords.longitude
-  //             }
-  //           });
-  //         },
-  //         (error) => {
-  //           console.error("❌ Geolocation error:", error.message);
-  //         },
-  //         {
-  //           enableHighAccuracy: true,
-  //           timeout: 10000,       // Wait max 10 sec
-  //           maximumAge: 0         // Always fetch new location, no cache
-  //         }
-  //       );
-  //     } else {
-  //       console.error("🚫 Geolocation not supported by this browser.");
-  //     }
-  //   };
-
-  //   // Call once immediately
-  //   updateLocation();
-
-  //   // Repeat every 10 seconds
-  //   const locationInterval = setInterval(updateLocation, 10000);
-
-  //   // Cleanup on unmount
-  //   return () => clearInterval(locationInterval)
-  // });
-
-
 
   useEffect(() => {
     if (!captain?._id) return;
 
-
-
-
-    // Join the socket room
     socket.emit('join', {
       userId: captain._id,
       userType: 'captain'
     });
 
-    // Location updater
     const updateLocation = () => {
       if (navigator.geolocation) {
-        console.log("📍 Trying to get current location...");
-
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            const accuracy = position.coords.accuracy;
-
-            console.log("✅ Location fetched:", {
-              lat,
-              lng,
-              accuracy: `${accuracy} meters`
-            });
-
-            // Store in state to pass as prop elsewhere
             setCaptainLocation({ lat, lng });
 
-            // Emit to backend
             socket.emit('update-location-captain', {
               userId: captain._id,
               location: { lat, lng }
@@ -137,76 +58,33 @@ const CaptainHome = () => {
             maximumAge: 0
           }
         );
-      } else {
-        console.error("🚫 Geolocation not supported by this browser.");
       }
     };
 
-    // Immediate call
     updateLocation();
-
-    // Repeat every 10 seconds
     const locationInterval = setInterval(updateLocation, 10000);
 
-    // Clean up
     return () => clearInterval(locationInterval);
-
   }, [captain, socket]);
 
-
-
-
-  //   ✅ What it does:
-
-  // Checks if the browser supports geolocation.
-
-  // If yes:
-
-  // Gets the user's current latitude and longitude.
-
-  // Sends it to the server using socket.emit('update-location-captain', {...}).
-
-  // Logs the location in the browser console.
-
-  // If not:
-
-  // Logs an error saying geolocation isn’t supported
-
-  // As soon as the component mounts, it starts calling updateLocation() every 10 seconds.
-
-  // This means the captain's current location will be sent to the server repeatedly, keeping their position live/updated on the map or backend.
-
-  // On unmount (or component update), it clears the interval to avoid memory leaks
-
-
-
-
   socket.on('new-ride', (data) => {
-    console.log("New ride data received:", data);
     setRide(data);
     setRidePopupPanel(true);
-  })
+  });
 
   async function confirmRide() {
-
-    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm-ride`, {
+    await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm-ride`, {
       rideId: ride._id,
       captainId: captain._id,
-
     }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-    })
+    });
 
     setRidePopupPanel(false);
     setConfirmRidePopupPanel(true);
   }
-
-
-
-
-
 
   useGSAP(function () {
     if (ridePopupPanel) {
@@ -237,37 +115,17 @@ const CaptainHome = () => {
     [confirmRidePopupPanel]
   );
 
-
-
-  // const handleLogout = async () => {
-  //   try {
-  //     const token = localStorage.getItem('token');
-  //     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
-  //       method: 'POST',
-  //       credentials: 'include', // Important for session-based authentication
-  //     });
-
-  //     if (response.ok) {
-  //       // Clear any authentication tokens if stored
-  //       localStorage.removeItem('token');
-
-  //       console.log('Captain logout worked');
-
-  //       // Redirect to login page
-  //       navigate('/captain-login'); 
-  //     } else {
-  //       console.error('Logout failed');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error logging out:', error);
-  //   }
-  // };
-
+  useGSAP(function () {
+    if (walletHistoryPanel) {
+      gsap.to(walletHistoryPanelRef.current, { transform: "translateY(0)" });
+    } else {
+      gsap.to(walletHistoryPanelRef.current, { transform: "translateY(100%)" });
+    }
+  }, [walletHistoryPanel]);
 
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('token');
-
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/captains/logout`,
         {},
@@ -280,27 +138,13 @@ const CaptainHome = () => {
       );
 
       if (response.status === 200) {
-        // Clear any authentication tokens if stored
         localStorage.removeItem('token');
-        console.log('Captain logout worked');
-
-        // Redirect to login page
         navigate('/captain-login');
       }
     } catch (error) {
       console.error('Error logging out:', error.response?.data || error.message);
     }
   };
-
-
-
-
-
-
-
-
-
-
 
   return (
     <div className="bg-surface text-on-surface antialiased overflow-hidden h-screen relative font-headline">
@@ -310,6 +154,9 @@ const CaptainHome = () => {
           <img className="w-16 h-auto" src={logo} alt="Logo" />
         </div>
         <div className="flex items-center gap-1 md:gap-4">
+          <button onClick={() => setWalletHistoryPanel(true)} className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors active:scale-95 duration-200">
+            <i className="text-xl ri-wallet-3-line"></i>
+          </button>
           <button onClick={() => navigate('/captain-history')} className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors active:scale-95 duration-200">
             <i className="text-xl ri-history-line"></i>
           </button>
@@ -378,7 +225,12 @@ const CaptainHome = () => {
 
       {/* Dark Overlay for Modals */}
       <div
-        className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${ridePopupPanel || confirmRidePopupPanel ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${ridePopupPanel || confirmRidePopupPanel || walletHistoryPanel ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => {
+            setRidePopupPanel(false);
+            setConfirmRidePopupPanel(false);
+            setWalletHistoryPanel(false);
+        }}
       />
 
       {/* Ride Pop Up panel */}
@@ -410,6 +262,20 @@ const CaptainHome = () => {
           />
         </div>
       </div>
+
+      {/* Wallet History Drawer */}
+      <div
+          ref={walletHistoryPanelRef}
+          className="fixed w-full max-w-md left-1/2 -translate-x-1/2 h-[85vh] z-50 bottom-0 translate-y-full bg-white px-8 py-10 rounded-t-[3rem] shadow-[0_-20px_100px_rgba(0,0,0,0.15)] pointer-events-auto flex flex-col"
+      >
+          <div className="w-full text-center mb-4">
+              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto cursor-pointer" onClick={() => setWalletHistoryPanel(false)}></div>
+          </div>
+          <div className="flex-1 overflow-y-auto w-full">
+            <WalletHistoryDrawer isOpen={walletHistoryPanel} onClose={() => setWalletHistoryPanel(false)} />
+          </div>
+      </div>
+
     </div>
   );
 };
