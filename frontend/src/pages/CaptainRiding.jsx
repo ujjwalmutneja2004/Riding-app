@@ -353,71 +353,79 @@ const CaptainRiding = () => {
   const isReady = areCoordsValid && currentLocation?.lat && currentLocation?.lng;
 
   return (
-    <div className=" flex flex-col h-screen">
-     <div className="fixed p-4 top-0 left-0 right-0 bg-white z-10 flex items-center justify-between">
-       <img
+    <div className="relative h-screen bg-slate-50 font-['Inter'] overflow-hidden">
+      {/* Top Header */}
+      <div className="fixed p-4 top-0 left-0 right-0 bg-white/80 backdrop-blur-xl z-20 flex items-center justify-between border-b border-slate-200/50 shadow-sm">
+        <img
           className="w-20 h-auto"
           src={logo}
           alt="Logo"
         />
         <button
           onClick={handleLogout}
-          className="h-10 w-10 bg-white flex items-center justify-center rounded-full"
+          className="h-10 w-10 bg-slate-100 flex items-center justify-center rounded-full text-slate-600 hover:bg-slate-200 hover:text-black transition-colors"
         >
           <i className="text-lg font-medium ri-logout-box-r-line"></i>
         </button>
       </div>
 
+      {/* Map Content */}
+      {isReady ? (
+        <div className="absolute inset-0 z-0 w-full h-full">
+          <CaptainLiveTracking
+            destination={{
+              lat: Number(ride?.destLat),
+              lng: Number(ride?.destLng),
+            }}
+            pickup={{
+              lat: Number(ride?.pickupLat),
+              lng: Number(ride?.pickupLng),
+            }}
+            captainLocation={currentLocation}
+          />
+        </div>
+      ) : (
+        <div className="absolute inset-0 z-0 flex items-center justify-center bg-slate-100">
+           <div className="animate-spin h-8 w-8 border-4 border-black border-t-transparent rounded-full"></div>
+        </div>
+      )}
 
-
-
-{isReady ? (
-  <div className="flex-1 overflow-hidden">
-    <CaptainLiveTracking
-      destination={{
-        lat: Number(ride?.destLat),
-        lng: Number(ride?.destLng),
-      }}
-      pickup={{
-        lat: Number(ride?.pickupLat),
-        lng: Number(ride?.pickupLng),
-      }}
-      captainLocation={currentLocation}
-    />
-  </div>
-) : (
-  <div className="flex-1 flex items-center justify-center">
-    <p>Loading map...</p>
-  </div>
-)}
-      <div
-        className="h-1/5 p-6 flex flex-col justify-center bg-yellow-400 relative"
-      >
-        <div className="flex items-center justify-between w-full h-full">
-          <div className="flex flex-col">
-            <h5 className="text-lg font-bold mr-2">
-              {distance ? `${distance} KM ` : "Calculating..."}
-            </h5>
-            {ride?.rideMode && (
-              <div className="mt-1 flex items-center gap-1 font-semibold text-sm">
-                <i className="ri-steering-2-fill"></i>
-                {ride.rideMode}
-              </div>
-            )}
+      {/* Modernized Bottom Panel */}
+      <div className="absolute bottom-0 left-0 w-full z-10 bg-white/95 backdrop-blur-2xl rounded-t-[2.5rem] shadow-[0_-20px_40px_rgba(0,0,0,0.1)] p-6 pb-8 border-t border-slate-100 transition-all duration-300">
+          <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
+          <div className="flex items-center justify-between w-full max-w-lg mx-auto">
+          {/* Info Section */}
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-inner">
+               <i className="ri-route-line text-2xl"></i>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Distance</span>
+              <h5 className="text-2xl font-black text-slate-800 tracking-tight">
+                {distance ? `${distance} KM` : <span className="text-lg opacity-50 font-semibold">-- KM</span>}
+              </h5>
+              {ride?.rideMode && (
+                <div className="mt-1 flex items-center gap-1.5 font-bold text-[11px] text-slate-500 uppercase tracking-wider bg-slate-100 px-2.5 py-1 rounded-full w-fit">
+                  <i className="ri-steering-2-fill text-blue-500"></i>
+                  {ride.rideMode}
+                </div>
+              )}
+            </div>
           </div>
           
-          <div className="flex flex-col gap-2">
+          {/* Actions Section */}
+          <div className="flex flex-col gap-3">
             <button
               onClick={() => calculateDistance(currentLocation)}
-              className="px-4 py-2 text-sm bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition duration-300"
+              className="px-4 py-2 text-xs font-bold text-slate-500 bg-slate-100 rounded-xl hover:bg-slate-200 hover:text-slate-800 transition-colors duration-300 flex items-center justify-center gap-1 active:scale-95"
             >
-              Get Distance
+              <i className="ri-map-pin-line"></i> Get Distance
             </button>
             <button 
               onClick={() => setFinishRidePanel(true)}
-              className="bg-green-600 text-white font-semibold p-3 px-8 rounded-lg shadow-md hover:bg-green-700 transition duration-300"
+              className="bg-black text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-0.5 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
             >
-              Complete Ride
+              Complete Ride <i className="ri-check-double-line text-lg"></i>
             </button>
           </div>
         </div>
@@ -425,7 +433,7 @@ const CaptainRiding = () => {
 
       <div
         ref={finishRidePanelRef}
-        className="fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12"
+        className="fixed w-full z-50 bottom-0 translate-y-full bg-white px-3 py-10 pt-12 rounded-t-[2.5rem] shadow-2xl"
       >
         <FinishRide
         ride={ride}

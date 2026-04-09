@@ -28,7 +28,7 @@ const WalletHistoryDrawer = ({ isOpen = true, onClose }) => {
     }, [isOpen]);
 
     return (
-        <div className="h-full flex flex-col font-['Inter']">
+        <div className="h-full flex flex-col flex-1 min-h-0 font-['Inter']">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
