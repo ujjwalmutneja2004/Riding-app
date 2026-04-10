@@ -183,7 +183,9 @@ const LiveTracking = ({ destination }) => {
     const mapElement = useRef(null);
     const mapRef = useRef(null);
     const markerRef = useRef(null);
+    const routeDrawnRef = useRef(false);
     const [userPosition, setUserPosition] = useState(null);
+    const [isMapReady, setIsMapReady] = useState(false);
 
     // Initialize map
     useEffect(() => {
@@ -196,15 +198,18 @@ const LiveTracking = ({ destination }) => {
 
         mapRef.current = map;
 
-        // Add destination marker
-        if (destination?.lat && destination?.lng) {
-            new tt.Marker({ color: 'red' })
-                .setLngLat([destination.lng, destination.lat])
-                .addTo(map);
-        }
+        map.on('load', () => {
+            setIsMapReady(true);
+            // Add destination marker
+            if (destination?.lat && destination?.lng) {
+                new tt.Marker({ color: 'red' })
+                    .setLngLat([destination.lng, destination.lat])
+                    .addTo(map);
+            }
+        });
 
         return () => map.remove();
-    }, [destination]);
+    }, [destination?.lat, destination?.lng]);
 
     // Track user & update route
     useEffect(() => {
@@ -266,18 +271,29 @@ const LiveTracking = ({ destination }) => {
 
                 setUserPosition(current);
 
-                if (mapRef.current) {
-                    mapRef.current.setCenter([current.lng, current.lat]);
+                if (mapRef.current && isMapReady) {
+                    // Smoothly pan map instead of rigid setCenter
+                    mapRef.current.easeTo({
+                        center: [current.lng, current.lat],
+                        duration: 1000 // 1-second smooth panning
+                    });
 
                     if (!markerRef.current) {
-                        markerRef.current = new tt.Marker()
+                        const iconElement = document.createElement('div');
+                        iconElement.innerHTML = `<div style="background-color: #2563eb; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>`;
+
+                        markerRef.current = new tt.Marker({ element: iconElement })
                             .setLngLat([current.lng, current.lat])
                             .addTo(mapRef.current);
                     } else {
                         markerRef.current.setLngLat([current.lng, current.lat]);
                     }
 
-                    drawRoute(current, destination);
+                    // Only draw the route ONCE
+                    if (!routeDrawnRef.current) {
+                        drawRoute(current, destination);
+                        routeDrawnRef.current = true;
+                    }
                 }
             },
             (error) => {
@@ -304,10 +320,10 @@ const LiveTracking = ({ destination }) => {
         );
 
         return () => navigator.geolocation.clearWatch(watchId);
-    }, [destination]);
+    }, [destination?.lat, destination?.lng, isMapReady]);
 
     return (
-        <div ref={mapElement} style={{ width: '100%', height: '60vh' }} />
+        <div ref={mapElement} style={{ width: '100%', height: '100%', minHeight: '400px' }} />
     );
 };
 

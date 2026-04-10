@@ -194,7 +194,7 @@
 
 import React, { useRef, useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import CaptainLiveTracking from "../components/CaptainLiveTracking";
+import LiveTracking from "../components/LiveTracking";
 import FinishRide from "../components/FinishRide";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -370,18 +370,14 @@ const CaptainRiding = () => {
       </div>
 
       {/* Map Content */}
+      {/* Map Content */}
       {isReady ? (
         <div className="absolute inset-0 z-0 w-full h-full">
-          <CaptainLiveTracking
+          <LiveTracking
             destination={{
               lat: Number(ride?.destLat),
               lng: Number(ride?.destLng),
             }}
-            pickup={{
-              lat: Number(ride?.pickupLat),
-              lng: Number(ride?.pickupLng),
-            }}
-            captainLocation={currentLocation}
           />
         </div>
       ) : (
@@ -391,7 +387,7 @@ const CaptainRiding = () => {
       )}
 
       {/* Modernized Bottom Panel */}
-      <div className="absolute bottom-0 left-0 w-full z-10 bg-white/95 backdrop-blur-2xl rounded-t-[2.5rem] shadow-[0_-20px_40px_rgba(0,0,0,0.1)] p-6 pb-8 border-t border-slate-100 transition-all duration-300">
+      <div className="absolute bottom-0 left-0 w-full z-10 bg-white/95 backdrop-blur-2xl rounded-t-[2.5rem] shadow-[0_-20px_40px_rgba(0,0,0,0.1)] p-8 pb-12 border-t border-slate-100 transition-all duration-300">
           <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
           <div className="flex items-center justify-between w-full max-w-lg mx-auto">
           {/* Info Section */}

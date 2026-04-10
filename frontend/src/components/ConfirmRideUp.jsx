@@ -41,8 +41,8 @@ const ConfirmRidePopUp = (props) => {
 
           const originLat = currentLocation.lat;
           const originLng = currentLocation.lng;
-          const destLat = Number(props.ride?.destLat);  // Ensure it's a number
-          const destLng = Number(props.ride?.destLng);  // Ensure it's a number
+          const destLat = Number(props.ride?.pickupLat);  // Ensure it's a number
+          const destLng = Number(props.ride?.pickupLng);  // Ensure it's a number
 
           // Check if any coordinates are missing
           if (!originLat || !originLng || !destLat || !destLng) {

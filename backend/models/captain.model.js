@@ -1,6 +1,7 @@
 const mongoose=require('mongoose')
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
+
 const captainSchema=new mongoose.Schema({
     fullname:{
         firstname:{
@@ -19,14 +20,13 @@ const captainSchema=new mongoose.Schema({
         unique:true,
         lowercase:true,
         match:[/\S+@\S+\.\S+/,'Please enter a valid email address']
-
     },
     password:{
         type:String,
         select:false,
         required:true,
     },
-    googleId: { type: String, unique: true }, // ✅ Add this for Google OAuth
+    googleId: { type: String, sparse: true },
     socketId:{
         type:String,
     },
@@ -64,56 +64,44 @@ const captainSchema=new mongoose.Schema({
             required:true,
             min:[1,'Capacity must be at least 1']
         },
-        vehicleType:
-            {
-                type:String,
-                enum:['car','motorcycle','auto'],
-                required:true,
+        vehicleType:{
+            type:String,
+            enum:['car','motorcycle','auto'],
+            required:true,
+        },
+    },
+    location:{
+        lat:{ type:Number },
+        lng:{ type:Number }
+    },
+    ratings: [
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'user'
             },
-
-        },
-        
-        location:{
-            lat:{
-                type:Number,
-            },
-           
-            lng:{
-                type:Number,
+            score: {
+                type: Number,
+                min: 1,
+                max: 5
             }
-
-        },
-        ratings: [
-            {
-                user: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: 'user'
-                },
-                score: {
-                    type: Number,
-                    min: 1,
-                    max: 5
-                }
-            }
-        ],
-        averageRating: {
-            type: Number,
-            default: 0
-        },
-        wallet: {
-            type: Number,
-            default: 0
-        },
-        totalEarnings: {
-            type: Number,
-            default: 0
         }
-    }
-)
-captainSchema.add({
+    ],
+    averageRating: {
+        type: Number,
+        default: 0
+    },
+    wallet: {
+        type: Number,
+        default: 0
+    },
+    totalEarnings: {
+        type: Number,
+        default: 0
+    },
     resetOtp: { type: String, select: false },
     resetOtpExpire: { type: Date }
-});
+}, { timestamps: true });
 
 ///////////methods are used when you want to call on whole model  
 captainSchema.methods.generateAuthToken=function(){
@@ -125,14 +113,10 @@ captainSchema.methods.comparePassword=async function(password){
     return await bcrypt.compare(password,this.password)
 }
 
-
 ///////////methods are used when you want to call on particular document 
 captainSchema.statics.hashPassword=async function(password){
     return await bcrypt.hash(password,10)
 }
-
-
-
 
 const captainModel=mongoose.model('captain',captainSchema)
 module.exports=captainModel;

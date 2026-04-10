@@ -159,6 +159,7 @@ const CaptainLiveTracking = ({ pickup, destination, captainLocation }) => {
     const mapElement = useRef(null);
     const mapRef = useRef(null);
     const captainMarkerRef = useRef(null);
+    const routeDrawnRef = useRef(false);
     const [isMapReady, setIsMapReady] = useState(false);
 
     useEffect(() => {
@@ -183,7 +184,8 @@ const CaptainLiveTracking = ({ pickup, destination, captainLocation }) => {
         map.on('load', () => {
             setIsMapReady(true);
 
-            new tt.Marker({ color: 'orange' })
+            // Use Green marker for Pickup Location
+            new tt.Marker({ color: 'green' })
                 .setLngLat([pickup.lng, pickup.lat])
                 .addTo(map);
 
@@ -195,7 +197,7 @@ const CaptainLiveTracking = ({ pickup, destination, captainLocation }) => {
         return () => {
             map.remove();
         };
-    }, [pickup, destination]);
+    }, [pickup?.lat, pickup?.lng, destination?.lat, destination?.lng]);
 
     const drawRoute = (start, end, id, color) => {
         const map = mapRef.current;
@@ -254,22 +256,31 @@ const CaptainLiveTracking = ({ pickup, destination, captainLocation }) => {
                 return;
             }
 
-            map.setCenter([captainLocation.lng, captainLocation.lat]);
+            // Smoothly pan camera
+            map.easeTo({ center: [captainLocation.lng, captainLocation.lat], duration: 1000 });
 
             if (!captainMarkerRef.current) {
-                captainMarkerRef.current = new tt.Marker({ color: 'blue' })
+                // Distinct custom marker for Captain
+                const iconElement = document.createElement('div');
+                iconElement.innerHTML = `<div style="background-color: #2563eb; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>`;
+
+                captainMarkerRef.current = new tt.Marker({ element: iconElement })
                     .setLngLat([captainLocation.lng, captainLocation.lat])
                     .addTo(map);
             } else {
                 captainMarkerRef.current.setLngLat([captainLocation.lng, captainLocation.lat]);
             }
 
-            drawRoute(captainLocation, pickup, 'route-to-pickup', '#007aff');
-            drawRoute(pickup, destination, 'route-to-destination', '#00cc44');
+            // Only draw routes ONCE to save API calls and stop flickering
+            if (!routeDrawnRef.current) {
+                drawRoute(captainLocation, pickup, 'route-to-pickup', '#007aff');
+                drawRoute(pickup, destination, 'route-to-destination', '#00cc44');
+                routeDrawnRef.current = true;
+            }
         };
 
         if (isMapReady) tryDrawRoutes();
-    }, [captainLocation, pickup, destination, isMapReady]);
+    }, [captainLocation?.lat, captainLocation?.lng, pickup?.lat, pickup?.lng, destination?.lat, destination?.lng, isMapReady]);
 
     return (
         <div

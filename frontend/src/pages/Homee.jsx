@@ -12,6 +12,7 @@ import RideModePanel from "../components/RideModePanel";
 import ConfirmRide from "../components/ConfirmRide";
 import LookingForDriver from "../components/LookingForDriver";
 import WaitingForDriver from "../components/WaitingForDriver";
+import CaptainLiveTracking from "../components/CaptainLiveTracking";
 import { SocketContext } from "../context/SocketContext"
 import { useContext } from "react";
 import {UserDataContext} from "../context/UserContext"
@@ -258,15 +259,26 @@ async function createRide() {
       >
         <i className="text-lg font-medium ri-logout-box-line"></i>
       </button>
-      <div className="h-screen w-screen">
-        <img
-          className="h-full w-full object-cover"
-          src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
-          alt=""
-        />
+      <div className="h-screen w-screen relative z-0">
+        {isWaitingForDriver && ride ? (
+          <CaptainLiveTracking
+            pickup={{ lat: ride?.pickupLat, lng: ride?.pickupLng }}
+            destination={{ lat: ride?.destLat, lng: ride?.destLng }}
+            captainLocation={{
+              lat: ride?.captain?.location?.lat || ride?.pickupLat,
+              lng: ride?.captain?.location?.lng || ride?.pickupLng
+            }}
+          />
+        ) : (
+          <img
+            className="h-full w-full object-cover"
+            src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
+            alt=""
+          />
+        )}
       </div>
-      <div className="flex flex-col justify-end h-screen absolute top-0 w-full">
-        <div className="h-[30%] p-6 bg-white relative">
+      <div className="flex flex-col justify-end h-screen absolute top-0 w-full pointer-events-none">
+        <div className="h-[30%] p-6 bg-white relative pointer-events-auto">
           <h5
             ref={panelCloseRef}
             onClick={() => setPanelOpen(false)}
@@ -325,7 +337,7 @@ async function createRide() {
         </div>
 
         {/* vehicle panel */}
-        <div ref={panelRef} className="  h-[70%] bg-white h-0">
+        <div ref={panelRef} className="  h-[70%] bg-white h-0 pointer-events-auto">
           <Locationsearchpanel
             setPanelOpen={setPanelOpen}
             setVehiclePanel={setVehiclePanel}
