@@ -52,18 +52,18 @@ const CaptainProfile = () => {
                     </h2>
                     <p className="text-gray-500 font-medium mb-6">Captain • TravelX Partner</p>
                     
-                    <div className="grid grid-cols-3 gap-4 border-t border-gray-100 pt-6">
-                        <div>
-                            <p className="text-xl font-black text-gray-900">{captain.averageRating || '4.9'}</p>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Rating</p>
+                    <div className="grid grid-cols-3 gap-2 border-t border-gray-100 pt-6">
+                        <div className="px-1">
+                            <p className="text-lg font-black text-gray-900 truncate">{captain.averageRating ? parseFloat(captain.averageRating).toFixed(1) : '4.9'}</p>
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Rating</p>
                         </div>
-                        <div className="border-x border-gray-100">
-                            <p className="text-xl font-black text-gray-900">₹{captain.totalEarnings ? captain.totalEarnings.toFixed(0) : '0'}</p>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Earnings</p>
+                        <div className="border-x border-gray-100 px-1">
+                            <p className="text-lg font-black text-gray-900 truncate">₹{captain.totalEarnings ? captain.totalEarnings.toFixed(0) : '0'}</p>
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Earnings</p>
                         </div>
-                        <div>
-                            <p className="text-xl font-black text-gray-900">{'Active'}</p>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Status</p>
+                        <div className="px-1">
+                            <p className="text-lg font-black text-green-500 truncate">Active</p>
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Status</p>
                         </div>
                     </div>
                 </div>
@@ -121,7 +121,11 @@ const CaptainProfile = () => {
                             </div>
                             <div className="flex-1">
                                 <p className="text-[10px] text-gray-400 font-bold uppercase">Partner Since</p>
-                                <p className="text-sm font-bold text-gray-900">August 2024</p>
+                                <p className="text-sm font-bold text-gray-900">
+                                    {captain.createdAt
+                                        ? new Date(captain.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                                        : 'N/A'}
+                                </p>
                             </div>
                         </div>
                     </div>

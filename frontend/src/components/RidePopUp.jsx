@@ -204,7 +204,6 @@ const RidePopUp = (props) => {
           </button>
           <button
             onClick={() => {
-              props.setConfirmRidePopupPanel(true);
               props.confirmRide();
             }}
             className="bg-gradient-to-br from-[#00c853] to-[#00a343] text-white font-headline font-black text-lg py-3 rounded-2xl shadow-lg shadow-green-500/20 active:scale-95 transition-transform"
