@@ -19,6 +19,10 @@
   - Ride completion summary mail
 - 🔐 Logout & Error handling
 - 📱 Fully responsive mobile-friendly UI
+- 🛠️ Admin Dashboard & Centralized Captain Management
+  - Real-time monitoring of captains (drivers)
+  - Ride tracking & activity insights
+  - Centralized control for managing captain status, availability, and performance
 
 ---
 
@@ -47,6 +51,7 @@
 - TomTom API Key
 - Razorpay/Stripe API Key
 - Email provider credentials (Nodemailer / SendGrid)
+- cloudinary
 
 ---
 
@@ -63,13 +68,20 @@ Create a `.env` file inside `/backend`:
 
 ```env
 PORT=5000
-MONGO_URI=your_mongodb_uri
+DB_CONNECT=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
 TOMTOM_API_KEY=your_tomtom_key
 RAZORPAY_KEY=your_key
 RAZORPAY_SECRET=your_secret
 EMAIL_USER=youremail@example.com
 EMAIL_PASS=yourpassword
+SESSION_SECRE
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+CLOUDINARY_CLOUD_NAME
+SECRET_KEY
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET
 ```
 
 #### 💻 Frontend
@@ -82,6 +94,8 @@ npm install
 Create a `.env` file inside `/frontend`:
 
 ```env
+VITE_BASE_URL=your_vite_base_url(backend)
+VITE_PUBLISH=your_vite_publish_key(Razarpaykey)
 REACT_APP_TOMTOM_API_KEY=your_tomtom_key
 ```
 
