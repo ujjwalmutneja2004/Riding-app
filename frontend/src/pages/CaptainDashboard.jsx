@@ -75,8 +75,11 @@ const CaptainDashboard = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.chartData}>
                   <XAxis dataKey="name" fontSize={12} />
-                  <YAxis fontSize={12} width={40} />
-                  <Tooltip cursor={{fill: 'transparent'}} />
+                  <YAxis fontSize={12} width={40} tickFormatter={(value) => Math.round(value)} />
+                  <Tooltip 
+                    cursor={{fill: 'transparent'}} 
+                    formatter={(value) => [Math.round(value), "Earnings"]}
+                  />
                   <Bar dataKey="earnings" fill="#10B981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

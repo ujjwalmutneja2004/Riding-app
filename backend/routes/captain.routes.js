@@ -59,4 +59,5 @@ router.post('/settle-wallet', authMiddleware.authCaptain, captainController.hand
 router.get('/settlement-history', authMiddleware.authCaptain, captainController.getSettlementHistory);
 
 router.post('/logout', authMiddleware.authCaptain, captainController.logoutCaptain);
+router.patch('/toggle-status', authMiddleware.authCaptain, captainController.toggleAvailableStatus);
 module.exports = router;

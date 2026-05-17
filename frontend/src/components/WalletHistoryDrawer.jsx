@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const WalletHistoryDrawer = ({ onClose }) => {
+const WalletHistoryDrawer = ({ isOpen = true, onClose }) => {
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchHistory = async () => {
+            setLoading(true);
             try {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/captains/settlement-history`, {
                     headers: {
@@ -21,11 +22,13 @@ const WalletHistoryDrawer = ({ onClose }) => {
             }
         };
 
-        fetchHistory();
-    }, []);
+        if (isOpen) {
+            fetchHistory();
+        }
+    }, [isOpen]);
 
     return (
-        <div className="h-full flex flex-col font-['Inter']">
+        <div className="h-full flex flex-col flex-1 min-h-0 font-['Inter']">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>

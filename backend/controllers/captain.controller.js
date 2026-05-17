@@ -148,10 +148,9 @@ module.exports.logoutCaptain = async (req, res, next) => {
         console.log("Clearing cookie...");
         res.clearCookie('token', {
             httpOnly: true,
-            secure: true,  // ✅ Must be true on HTTPS (Render uses HTTPS)
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'None',
             path: '/',
-            domain: '.riding-app.onrender.com',
         });
 
         console.log("Cookie cleared");
@@ -364,5 +363,26 @@ module.exports.getSettlementHistory = async (req, res, next) => {
         res.status(200).json(history);
     } catch (err) {
         res.status(500).json({ message: 'Failed to fetch settlement history' });
+    }
+}
+
+module.exports.toggleAvailableStatus = async (req, res, next) => {
+    console.log("Toggle Status Request received for captain:", req.captain?._id);
+    try {
+        const captain = await captainModel.findById(req.captain._id);
+        if (!captain) {
+            return res.status(404).json({ message: 'Captain not found' });
+        }
+
+        captain.isAvailable = !captain.isAvailable;
+        await captain.save();
+
+        res.status(200).json({ 
+            message: `Status updated to ${captain.isAvailable ? 'Online' : 'Offline'}`,
+            isAvailable: captain.isAvailable 
+        });
+    } catch (err) {
+        console.error("Error toggling status:", err);
+        res.status(500).json({ message: 'Failed to toggle status' });
     }
 }
