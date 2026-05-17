@@ -34,7 +34,8 @@ origin: [
   // "https://29dv0wmq-5173.inc1.devtunnels.ms",
   "https://travelx-five.vercel.app",
   "https://travelx.dev",
-  "https://riding-app.onrender.com" 
+  "https://riding-app.onrender.com" ,
+   "https://www.travelx.dev"
 ], // Explicit frontend URL
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization",
