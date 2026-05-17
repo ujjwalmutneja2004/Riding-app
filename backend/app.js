@@ -148,7 +148,7 @@ app.get(
 
       console.log('Cookie set successfully');
       // Redirect to the frontend home page
-      res.redirect(`https://travelx-five.vercel.app/set-token?token=${token}`);
+      // res.redirect(`https://travelx-five.vercel.app/set-token?token=${token}`);
       // res.redirect('https://travelx-five.vercel.app/home');
       // res.redirect('http://localhost:5173/home');
       // res.redirect(`${process.env.FRONTEND_URL}/home`);
