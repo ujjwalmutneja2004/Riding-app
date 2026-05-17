@@ -28,13 +28,14 @@ const connectToDb = require('./db/db');
 connectToDb();
 
 app.use(cors({
-  //  origin: "*", // Allows requests from any origin
-  origin: [
-    "http://localhost:5173",
-    // "https://29dv0wmq-5173.inc1.devtunnels.ms",
-    "https://travelx-five.vercel.app",
-    "https://riding-app.onrender.com"
-  ], // Explicit frontend URL
+//  origin: "*", // Allows requests from any origin
+origin: [
+  "http://localhost:5173",
+  // "https://29dv0wmq-5173.inc1.devtunnels.ms",
+  "https://travelx-five.vercel.app",
+  "https://travelx.dev",
+  "https://riding-app.onrender.com" 
+], // Explicit frontend URL
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization",
   credentials: true // Set this to false if not using cookies
@@ -148,6 +149,9 @@ app.get(
       // Redirect to the frontend home page
       res.redirect(`https://travelx-five.vercel.app/set-token?token=${token}`);
       // res.redirect('https://travelx-five.vercel.app/home');
+      // res.redirect('http://localhost:5173/home');
+      // res.redirect(`${process.env.FRONTEND_URL}/home`);
+      res.redirect(`${process.env.FRONTEND_URL}/set-token?token=${token}`);
     } catch (error) {
       console.error('Error in Google OAuth callback:', error);
       res.redirect('/login');
