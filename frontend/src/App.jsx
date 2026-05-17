@@ -25,6 +25,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminProtectWrapper from "./pages/AdminProtectWrapper";
 import AdminCaptains from "./pages/AdminCaptains";
 import AdminCaptainDetails from "./pages/AdminCaptainDetails";
+import CaptainProfile from "./pages/CaptainProfile";
 
 const App = () => {
   return (
@@ -107,6 +108,11 @@ const App = () => {
           <AdminProtectWrapper>
             <AdminCaptainDetails />
           </AdminProtectWrapper>
+        } />
+        <Route path='/captain-profile' element={
+          <CaptainProtectWrapper>
+            <CaptainProfile />
+          </CaptainProtectWrapper>
         } />
 
       </Routes>

@@ -12,6 +12,7 @@ import RideModePanel from "../components/RideModePanel";
 import ConfirmRide from "../components/ConfirmRide";
 import LookingForDriver from "../components/LookingForDriver";
 import WaitingForDriver from "../components/WaitingForDriver";
+import CaptainLiveTracking from "../components/CaptainLiveTracking";
 import { SocketContext } from "../context/SocketContext"
 import { useContext } from "react";
 import {UserDataContext} from "../context/UserContext"
@@ -56,18 +57,38 @@ const [fare,setFare]=useState({})
  },[user])
 
 
-  socket.on("ride-confirmed", ride=> {
-    console.log("Ride confirmed and confirmation received to user:", ride);
-    setWaitingForDriver(true);
-    setVehicleFound(false);
-    setRide(ride);
-  })
+  useEffect(() => {
+    const handleRideConfirmed = (ride) => {
+      console.log("Ride confirmed and confirmation received to user:", ride);
+      setWaitingForDriver(true);
+      setVehicleFound(false);
+      setRide(ride);
+    };
 
-  socket.on('ride-started', ride => {
-    setWaitingForDriver(false);
-    navigate('/riding',{state:{ride}})
-  } )
+    const handleRideCancelled = () => {
+      console.log("Ride cancelled by captain");
+      alert("The captain has cancelled the ride. Looking for another driver...");
+      setWaitingForDriver(false);
+      setVehicleFound(true);
+      setRide(null);
+      createRide(); // Auto-restart the search for a new ride
+    };
 
+    const handleRideStarted = (ride) => {
+      setWaitingForDriver(false);
+      navigate('/riding',{state:{ride}});
+    };
+
+    socket.on("ride-confirmed", handleRideConfirmed);
+    socket.on("ride-cancelled-by-captain", handleRideCancelled);
+    socket.on('ride-started', handleRideStarted);
+
+    return () => {
+      socket.off("ride-confirmed", handleRideConfirmed);
+      socket.off("ride-cancelled-by-captain", handleRideCancelled);
+      socket.off('ride-started', handleRideStarted);
+    };
+  }, [socket, navigate, pickup, destination, vehicleType, rideMode]); 
   const submitHandler = (e) => {
     e.preventDefault();
   };
@@ -238,15 +259,26 @@ async function createRide() {
       >
         <i className="text-lg font-medium ri-logout-box-line"></i>
       </button>
-      <div className="h-screen w-screen">
-        <img
-          className="h-full w-full object-cover"
-          src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
-          alt=""
-        />
+      <div className="h-screen w-screen relative z-0">
+        {isWaitingForDriver && ride ? (
+          <CaptainLiveTracking
+            pickup={{ lat: ride?.pickupLat, lng: ride?.pickupLng }}
+            destination={{ lat: ride?.destLat, lng: ride?.destLng }}
+            captainLocation={{
+              lat: ride?.captain?.location?.lat || ride?.pickupLat,
+              lng: ride?.captain?.location?.lng || ride?.pickupLng
+            }}
+          />
+        ) : (
+          <img
+            className="h-full w-full object-cover"
+            src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
+            alt=""
+          />
+        )}
       </div>
-      <div className="flex flex-col justify-end h-screen absolute top-0 w-full">
-        <div className="h-[30%] p-6 bg-white relative">
+      <div className="flex flex-col justify-end h-screen absolute top-0 w-full pointer-events-none">
+        <div className="h-[30%] p-6 bg-white relative pointer-events-auto">
           <h5
             ref={panelCloseRef}
             onClick={() => setPanelOpen(false)}
@@ -305,7 +337,7 @@ async function createRide() {
         </div>
 
         {/* vehicle panel */}
-        <div ref={panelRef} className="  h-[70%] bg-white h-0">
+        <div ref={panelRef} className="  h-[70%] bg-white h-0 pointer-events-auto">
           <Locationsearchpanel
             setPanelOpen={setPanelOpen}
             setVehiclePanel={setVehiclePanel}

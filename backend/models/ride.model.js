@@ -108,4 +108,4 @@ rideSchema.pre('save', function (next) {
     next();
 });
 
-module.exports= mongoose.model('ride',rideSchema);
+module.exports = mongoose.model('ride', rideSchema);
