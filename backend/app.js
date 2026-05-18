@@ -28,20 +28,22 @@ const connectToDb = require('./db/db');
 connectToDb();
 
 app.use(cors({
-//  origin: "*", // Allows requests from any origin
-origin: [
-  "http://localhost:5173",
-  // "https://29dv0wmq-5173.inc1.devtunnels.ms",
-  "https://travelx-five.vercel.app",
-  "https://travelx.dev",
-  "https://riding-app.onrender.com" ,
-   "https://www.travelx.dev"
-], // Explicit frontend URL
-  methods: "GET,POST,PUT,DELETE",
+  //  origin: "*", // Allows requests from any origin
+  origin: [
+    "http://localhost:5173",
+    // "https://29dv0wmq-5173.inc1.devtunnels.ms",
+    "https://travelx-five.vercel.app",
+    "https://travelx.dev",
+    "https://riding-app.onrender.com",
+    "https://www.travelx.dev"
+  ], // Explicit frontend URL
+
+  methods: "GET,POST,PUT,DELETE,PATCH",
   allowedHeaders: "Content-Type,Authorization",
   credentials: true // Set this to false if not using cookies
 }));
 
+app.options("*", cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
