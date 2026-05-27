@@ -1,14 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import logo from '../assets/logoo.png';
+import { SocketContext } from '../context/SocketContext';
+
+const formatRideDate = (ride) => {
+    let date;
+    if (ride.createdAt) {
+        date = new Date(ride.createdAt);
+    } else if (ride._id) {
+        const timestamp = parseInt(ride._id.toString().substring(0, 8), 16) * 1000;
+        date = new Date(timestamp);
+    } else {
+        date = new Date();
+    }
+
+    if (isNaN(date.getTime())) {
+        return {
+            dateStr: 'Unknown Date',
+            timeStr: 'Unknown Time'
+        };
+    }
+
+    return {
+        dateStr: date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }),
+        timeStr: date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+    };
+};
 
 const AdminCaptainDetails = () => {
+    const { socket } = useContext(SocketContext);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const adminId = localStorage.getItem('adminId') || 'admin';
+        socket.emit('join', { userId: adminId, userType: 'admin' });
+
+        socket.on('captain-status-updated', ({ captainId, isAvailable }) => {
+            setData(prev => {
+                if (!prev) return prev;
+                if (prev.captain && prev.captain._id === captainId) {
+                    return { ...prev, captain: { ...prev.captain, isAvailable } };
+                }
+                return prev;
+            });
+        });
+
+        return () => {
+            socket.off('captain-status-updated');
+        };
+    }, [socket]);
+
     const { id } = useParams();
     const navigate = useNavigate();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showAllDocs, setShowAllDocs] = useState(false);
+    const [showAllRides, setShowAllRides] = useState(false);
+    const [allRidesList, setAllRidesList] = useState([]);
+    const [loadingRides, setLoadingRides] = useState(false);
+
+    const [showAllSettlements, setShowAllSettlements] = useState(false);
+    const [allSettlementsList, setAllSettlementsList] = useState([]);
+    const [loadingSettlements, setLoadingSettlements] = useState(false);
+
+    const handleViewFullLog = async () => {
+        setShowAllRides(true);
+        setLoadingRides(true);
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/admin/captain/${id}/rides`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            setAllRidesList(response.data);
+        } catch (err) {
+            console.error("Error fetching all rides:", err);
+        } finally {
+            setLoadingRides(false);
+        }
+    };
+
+    const handleViewSettlement = async () => {
+        setShowAllSettlements(true);
+        setLoadingSettlements(true);
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/admin/captain/${id}/settlements`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            setAllSettlementsList(response.data);
+        } catch (err) {
+            console.error("Error fetching settlements:", err);
+        } finally {
+            setLoadingSettlements(false);
+        }
+    };
 
     useEffect(() => {
         const fetchDetails = async () => {
@@ -57,7 +142,7 @@ const AdminCaptainDetails = () => {
                     <h2 className="text-xl font-black text-gray-900 tracking-tight">TravelX Admin</h2>
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Editorial Oversight</p>
                 </div>
-                
+
                 <nav className="flex-1 space-y-1">
                     <NavItem icon="ri-dashboard-line" label="Dashboard" onClick={() => navigate('/admin/dashboard')} />
                     <NavItem icon="ri-user-follow-line" label="Captain Approvals" onClick={() => navigate('/admin/approvals')} />
@@ -75,7 +160,7 @@ const AdminCaptainDetails = () => {
             {/* Main Content */}
             <main className="ml-64 flex-1 p-12">
                 {/* Header with Profile Summary */}
-                <header className="mb-12 flex justify-between items-start">
+                <header className="mb-6 flex justify-between items-center">
                     <div className="flex items-center gap-8">
                         <div className="relative">
                             <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-xl">
@@ -91,23 +176,23 @@ const AdminCaptainDetails = () => {
                                 </span>
                                 <div className="flex items-center gap-1 text-sm font-bold text-gray-900">
                                     <i className="ri-star-fill text-yellow-500"></i>
-                                    <span>{(captain.averageRating || 5.0).toFixed(2)}</span>
+                                    <span>{((captain.status === 'rejected' || !captain.averageRating) ? 0.0 : captain.averageRating).toFixed(2)}</span>
                                 </div>
                                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">ID: TX-{captain._id.slice(-6).toUpperCase()}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-3xl border border-[#efedf2] shadow-sm text-right min-w-[240px]">
+                    <div className="bg-white p-5 rounded-3xl border border-[#efedf2] shadow-sm text-right min-w-[240px]">
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Current Balance</p>
-                        <h3 className="text-3xl font-black text-gray-900 mb-4">₹{(captain.wallet || 0).toFixed(2)}</h3>
+                        <h3 className="text-3xl font-black text-gray-900 mb-3">₹{(captain.wallet || 0).toFixed(2)}</h3>
                         <button className="w-full bg-[#7b5900] text-white py-3 rounded-2xl text-xs font-black tracking-widest shadow-lg shadow-[#7b5900]/20 hover:scale-[1.02] transition-all uppercase">
                             Payout Now
                         </button>
                     </div>
                 </header>
 
-                <div className="grid grid-cols-12 gap-8 mb-12">
+                <div className="grid grid-cols-12 gap-8 mb-6">
                     {/* Total Life Earnings Card */}
                     <div className="col-span-8 bg-[#010102] rounded-[2.5rem] p-12 text-white relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-[#7b5900]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
@@ -161,9 +246,15 @@ const AdminCaptainDetails = () => {
                     <div className="col-span-8">
                         <div className="flex items-center justify-between mb-8">
                             <h3 className="text-2xl font-black text-gray-900">Recent Ride Activity <span className="text-[#7b5900]">——</span></h3>
-                            <button className="text-xs font-bold text-[#7b5900] flex items-center gap-1 hover:gap-2 transition-all">
-                                View Full Log <i className="ri-arrow-right-line"></i>
-                            </button>
+                            <div className="flex items-center gap-6">
+                                <button onClick={handleViewSettlement} className="text-xs font-black text-gray-400 hover:text-black flex items-center gap-2 transition-all">
+                                    <i className="ri-history-line text-sm"></i> View Settlement History
+                                </button>
+                                <span className="text-gray-200">|</span>
+                                <button onClick={handleViewFullLog} className="text-xs font-bold text-[#7b5900] flex items-center gap-1 hover:gap-2 transition-all">
+                                    View Ride Logs <i className="ri-arrow-right-line"></i>
+                                </button>
+                            </div>
                         </div>
                         <div className="bg-white rounded-[2.5rem] border border-[#efedf2] shadow-sm overflow-hidden">
                             <table className="w-full text-left">
@@ -176,17 +267,20 @@ const AdminCaptainDetails = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-[#efedf2]">
-                                    {recentRides.length > 0 ? recentRides.map(ride => (
-                                        <tr key={ride._id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-8 py-6">
-                                                <p className="text-sm font-black text-gray-900">{new Date(ride.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{new Date(ride.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} • Ride #{ride._id.slice(-4).toUpperCase()}</p>
-                                            </td>
-                                            <td className="px-6 py-6 text-sm font-bold text-gray-600">{(ride.distance / 1000).toFixed(1)} km</td>
-                                            <td className="px-6 py-6 text-sm font-black text-gray-900">₹{(ride.fare || 0).toFixed(2)}</td>
-                                            <td className="px-6 py-6 text-sm font-black text-[#7b5900]">₹{((ride.fare || 0) * 0.20).toFixed(2)}</td>
-                                        </tr>
-                                    )) : (
+                                    {recentRides.length > 0 ? recentRides.map(ride => {
+                                        const { dateStr, timeStr } = formatRideDate(ride);
+                                        return (
+                                            <tr key={ride._id} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-8 py-6">
+                                                    <p className="text-sm font-black text-gray-900">{dateStr}</p>
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{timeStr} • Ride #{ride._id.slice(-4).toUpperCase()}</p>
+                                                </td>
+                                                <td className="px-6 py-6 text-sm font-bold text-gray-600">{parseFloat(ride.distance || 0).toFixed(1)} km</td>
+                                                <td className="px-6 py-6 text-sm font-black text-gray-900">₹{(ride.fare || 0).toFixed(2)}</td>
+                                                <td className="px-6 py-6 text-sm font-black text-[#7b5900]">₹{((ride.fare || 0) * 0.20).toFixed(2)}</td>
+                                            </tr>
+                                        );
+                                    }) : (
                                         <tr>
                                             <td colSpan="4" className="px-8 py-12 text-center text-gray-400 font-bold">No recent ride activity found.</td>
                                         </tr>
@@ -200,7 +294,7 @@ const AdminCaptainDetails = () => {
                     <div className="col-span-4 space-y-8">
                         <div>
                             <h3 className="text-2xl font-black text-gray-900 mb-8">Fleet & Identity</h3>
-                            
+
                             {/* Vehicle Card */}
                             <div className="bg-white p-8 rounded-[2.5rem] border border-[#efedf2] shadow-sm mb-6">
                                 <div className="flex justify-between items-start mb-6">
@@ -248,7 +342,7 @@ const AdminCaptainDetails = () => {
                             </p>
                         </div>
 
-                        <button 
+                        <button
                             onClick={() => setShowAllDocs(true)}
                             className="w-full py-4 bg-white border border-[#efedf2] rounded-2xl text-[10px] font-black text-gray-400 hover:text-black transition-all uppercase tracking-[0.2em] hover:bg-gray-50 active:scale-95"
                         >
@@ -265,7 +359,7 @@ const AdminCaptainDetails = () => {
                         <button onClick={() => setShowAllDocs(false)} className="absolute top-8 right-8 w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-all text-xl">
                             <i className="ri-close-line"></i>
                         </button>
-                        
+
                         <div className="mb-12">
                             <h2 className="text-3xl font-black text-gray-900 tracking-tight">Vetting Library</h2>
                             <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">TX-{captain._id.toUpperCase()}</p>
@@ -278,6 +372,146 @@ const AdminCaptainDetails = () => {
                             <DocumentCard label="Number Plate Photo" src={captain.documents?.numberPlate} />
                             <DocumentCard label="Identity Selfie" src={captain.documents?.selfie} />
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {showAllRides && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-12">
+                    <div className="bg-white w-full max-w-6xl rounded-[3rem] p-12 relative max-h-[85vh] overflow-y-auto flex flex-col">
+                        <button onClick={() => setShowAllRides(false)} className="absolute top-8 right-8 w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-all text-xl">
+                            <i className="ri-close-line"></i>
+                        </button>
+
+                        <div className="mb-8">
+                            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Ride Logs</h2>
+                            <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">Full Trip History — TX-{captain._id.toUpperCase()}</p>
+                        </div>
+
+                        {loadingRides ? (
+                            <div className="flex items-center justify-center py-24 flex-1">
+                                <div className="animate-spin h-8 w-8 border-4 border-black border-t-transparent rounded-full"></div>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-[2.5rem] border border-[#efedf2] overflow-hidden flex-1">
+                                <div className="max-h-[50vh] overflow-y-auto">
+                                    <table className="w-full text-left">
+                                        <thead>
+                                            <tr className="bg-[#fbfbfd] border-b border-[#efedf2] sticky top-0 z-10">
+                                                <th className="px-8 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest whitespace-nowrap">Date & Time</th>
+                                                <th className="px-6 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Pickup & Destination</th>
+                                                <th className="px-6 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest whitespace-nowrap">Distance</th>
+                                                <th className="px-6 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest whitespace-nowrap">Fare</th>
+                                                <th className="px-6 py-6 text-[10px] font-black uppercase text-[#7b5900] tracking-widest whitespace-nowrap">Fee (20%)</th>
+                                                <th className="px-6 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest whitespace-nowrap">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-[#efedf2]">
+                                            {allRidesList.length > 0 ? allRidesList.map(ride => {
+                                                const { dateStr, timeStr } = formatRideDate(ride);
+                                                return (
+                                                    <tr key={ride._id} className="hover:bg-gray-50 transition-colors">
+                                                        <td className="px-8 py-6 whitespace-nowrap">
+                                                            <p className="text-sm font-black text-gray-900">{dateStr}</p>
+                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{timeStr} • Ride #{ride._id.slice(-4).toUpperCase()}</p>
+                                                        </td>
+                                                        <td className="px-6 py-6">
+                                                            <p className="text-xs font-bold text-gray-700 truncate max-w-[200px]" title={ride.pickup}><strong>From:</strong> {ride.pickup}</p>
+                                                            <p className="text-xs font-bold text-gray-400 truncate max-w-[200px] mt-1" title={ride.destination}><strong>To:</strong> {ride.destination}</p>
+                                                        </td>
+                                                        <td className="px-6 py-6 text-sm font-bold text-gray-600 whitespace-nowrap">{parseFloat(ride.distance || 0).toFixed(1)} km</td>
+                                                        <td className="px-6 py-6 text-sm font-black text-gray-900 whitespace-nowrap">₹{(ride.fare || 0).toFixed(2)}</td>
+                                                        <td className="px-6 py-6 text-sm font-black text-[#7b5900] whitespace-nowrap">₹{((ride.fare || 0) * 0.20).toFixed(2)}</td>
+                                                        <td className="px-6 py-6 whitespace-nowrap">
+                                                            <span className={`text-[9px] font-black px-2.5 py-1 rounded-full border tracking-widest uppercase ${ride.status === 'completed' ? 'bg-green-50 text-green-600 border-green-100' :
+                                                                    ride.status === 'cancelled' ? 'bg-red-50 text-red-500 border-red-100' :
+                                                                        ride.status === 'ongoing' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                                            'bg-yellow-50 text-yellow-600 border-yellow-100'
+                                                                }`}>
+                                                                {ride.status || 'pending'}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            }) : (
+                                                <tr>
+                                                    <td colSpan="6" className="px-8 py-12 text-center text-gray-400 font-bold">No ride activity found.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Settlement Logs Modal (View All Settlements & Payouts) */}
+            {showAllSettlements && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-12">
+                    <div className="bg-white w-full max-w-6xl rounded-[3rem] p-12 relative max-h-[85vh] overflow-y-auto flex flex-col">
+                        <button onClick={() => setShowAllSettlements(false)} className="absolute top-8 right-8 w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-all text-xl">
+                            <i className="ri-close-line"></i>
+                        </button>
+
+                        <div className="mb-8">
+                            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Settlement & Payout Logs</h2>
+                            <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">Full Transaction Ledger — TX-{captain._id.toUpperCase()}</p>
+                        </div>
+
+                        {loadingSettlements ? (
+                            <div className="flex items-center justify-center py-24 flex-1">
+                                <div className="animate-spin h-8 w-8 border-4 border-black border-t-transparent rounded-full"></div>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-[2.5rem] border border-[#efedf2] overflow-hidden flex-1">
+                                <div className="max-h-[50vh] overflow-y-auto">
+                                    <table className="w-full text-left">
+                                        <thead>
+                                            <tr className="bg-[#fbfbfd] border-b border-[#efedf2] sticky top-0 z-10">
+                                                <th className="px-8 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Date & Time</th>
+                                                <th className="px-6 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Type</th>
+                                                <th className="px-6 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Amount</th>
+                                                <th className="px-6 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Prev. Balance</th>
+                                                <th className="px-6 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Method</th>
+                                                <th className="px-8 py-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-[#efedf2]">
+                                            {allSettlementsList.length > 0 ? allSettlementsList.map(settlement => {
+                                                const { dateStr, timeStr } = formatRideDate(settlement);
+                                                return (
+                                                    <tr key={settlement._id} className="hover:bg-gray-50 transition-colors">
+                                                        <td className="px-8 py-6">
+                                                            <p className="text-sm font-black text-gray-900">{dateStr}</p>
+                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{timeStr}</p>
+                                                        </td>
+                                                        <td className="px-6 py-6">
+                                                            <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border tracking-wider ${settlement.type === 'CASHOUT' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>
+                                                                {settlement.type}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-6 text-sm font-black text-gray-900">₹{(settlement.amount || 0).toFixed(2)}</td>
+                                                        <td className="px-6 py-6 text-sm font-bold text-gray-500">₹{(settlement.previousBalance || 0).toFixed(2)}</td>
+                                                        <td className="px-6 py-6 text-xs font-bold text-gray-600 uppercase tracking-wider">{settlement.paymentMethod || 'MANUAL'}</td>
+                                                        <td className="px-8 py-6">
+                                                            <span className={`text-[9px] font-black px-2.5 py-1 rounded-full border tracking-widest ${settlement.status === 'SUCCESS' ? 'bg-green-50 text-green-600 border-green-100' : settlement.status === 'FAILED' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-yellow-50 text-yellow-600 border-yellow-100'}`}>
+                                                                {settlement.status || 'SUCCESS'}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            }) : (
+                                                <tr>
+                                                    <td colSpan="6" className="px-8 py-12 text-center text-gray-400 font-bold">No settlements found.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

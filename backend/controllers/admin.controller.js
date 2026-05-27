@@ -3,6 +3,7 @@ const adminModel = require('../models/admin.model');
 const CompanyWallet = require('../models/companyWallet.model');
 const blacklistTokenModel = require('../models/blacklist.Token.model');
 const { sendMessageToSocketId } = require('../socket');
+const SettlementHistory = require('../models/settlement.model');
 
 module.exports.registerAdmin = async (req, res) => {
     try {
@@ -61,7 +62,7 @@ module.exports.approveCaptain = async (req, res) => {
     try {
         const { id } = req.params;
         const captain = await captainModel.findByIdAndUpdate(id, { status: 'approved' }, { new: true });
-        
+
         if (!captain) {
             return res.status(404).json({ message: 'Captain not found' });
         }
@@ -84,10 +85,10 @@ module.exports.rejectCaptain = async (req, res) => {
     try {
         const { id } = req.params;
         const { rejectionReason } = req.body;
-        
-        const captain = await captainModel.findByIdAndUpdate(id, { 
+
+        const captain = await captainModel.findByIdAndUpdate(id, {
             status: 'rejected',
-            rejectionReason: rejectionReason 
+            rejectionReason: rejectionReason
         }, { new: true });
 
         if (!captain) {
@@ -112,7 +113,7 @@ module.exports.getAdminStats = async (req, res) => {
     try {
         const total = await captainModel.countDocuments();
         const pending = await captainModel.countDocuments({ status: 'pending' });
-        const approved = await captainModel.countDocuments({ status: 'approved' });
+        const approved = await captainModel.countDocuments({ status: { $in: ['approved', 'active', 'inactive'] } });
         const rejected = await captainModel.countDocuments({ status: 'rejected' });
         const active = await captainModel.countDocuments({ status: 'active' });
 
@@ -141,7 +142,7 @@ module.exports.getDetailedFleetStats = async (req, res) => {
         const wallet = await CompanyWallet.getWallet();
         // Include both approved and rejected captains in the list
         const captains = await captainModel.find({ status: { $in: ['approved', 'rejected', 'active', 'inactive'] } });
-        
+
         const fleet = await Promise.all(captains.map(async (captain) => {
             const rides = await rideModel.find({ captain: captain._id, status: 'completed' });
             const rideCount = rides.length;
@@ -157,7 +158,7 @@ module.exports.getDetailedFleetStats = async (req, res) => {
                 grossEarnings,
                 platformFee,
                 netPayout,
-                performance: captain.averageRating || 5.0,
+                performance: (captain.status === 'rejected' || !captain.averageRating) ? 0.0 : captain.averageRating,
                 status: captain.status,
                 isAvailable: captain.isAvailable
             };
@@ -178,13 +179,13 @@ module.exports.getCaptainDetails = async (req, res) => {
     try {
         const { id } = req.params;
         const captain = await captainModel.findById(id).select('-password');
-        
+
         if (!captain) {
             return res.status(404).json({ message: 'Captain not found' });
         }
 
-        // Fetch last 5 completed rides
-        const recentRides = await rideModel.find({ captain: id, status: 'completed' })
+        // Fetch last 5 rides of any status, sorted by newest first
+        const recentRides = await rideModel.find({ captain: id })
             .sort({ createdAt: -1 })
             .limit(5);
 
@@ -205,5 +206,28 @@ module.exports.getCaptainDetails = async (req, res) => {
     } catch (err) {
         console.error("Error fetching captain details:", err);
         res.status(500).json({ message: 'Error fetching captain details' });
+    }
+};
+
+module.exports.getCaptainAllRides = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const allRides = await rideModel.find({ captain: id }).sort({ createdAt: -1 });
+        res.status(200).json(allRides);
+    } catch (err) {
+        console.error("Error fetching all rides for captain:", err);
+        res.status(500).json({ message: 'Error fetching all rides' });
+    }
+};
+
+
+module.exports.getCaptainSettlements = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const settlements = await SettlementHistory.find({ captain: id }).sort({ createdAt: -1 });
+        res.status(200).json(settlements);
+    } catch (err) {
+        console.error("Error fetching settlements for captain:", err);
+        res.status(500).json({ message: 'Error fetching settlements' });
     }
 };

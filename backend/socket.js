@@ -36,6 +36,9 @@ function initializeSocket(server) {
       } else if (userType === "captain") {
         await captainModel.findByIdAndUpdate(userId, { socketId: socket.id });
         console.log(`Captain ${userId} joined with socket ${socket.id} and userType ${userType}`);
+      } else if (userType === "admin") {
+        socket.join('admin-room');
+        console.log(`Admin ${userId} joined admin-room`);
       }
     });
 
@@ -76,7 +79,15 @@ function initializeSocket(server) {
   
       // Optionally clear socketId from DB
       await userModel.updateOne({ socketId: socket.id }, { $unset: { socketId: "" } });
-      await captainModel.updateOne({ socketId: socket.id }, { $unset: { socketId: "" } , $set: { isAvailable: false }});
+      
+      const captain = await captainModel.findOne({ socketId: socket.id });
+      if (captain) {
+        captain.isAvailable = false;
+        captain.socketId = undefined;
+        await captain.save();
+        console.log(`Captain ${captain._id} disconnected and marked offline.`);
+        module.exports.broadcastAdmin('captain-status-updated', { captainId: captain._id, isAvailable: false });
+      }
     });
   });
 } 
@@ -95,6 +106,11 @@ function sendMessageToSocketId(socketId, messageObject) {
 module.exports = {
   initializeSocket,
   sendMessageToSocketId,
+  broadcastAdmin: (event, data) => {
+    if (io) {
+      io.to('admin-room').emit(event, data);
+    }
+  },
 };
 
 

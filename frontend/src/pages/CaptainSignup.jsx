@@ -3,9 +3,65 @@ import { Link, useNavigate } from 'react-router-dom';
 import { CaptainDataContext } from '../context/CaptainContext';
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; 
+import 'react-toastify/dist/ReactToastify.css';
 import { FaEye, FaEyeSlash, FaCloudUploadAlt, FaCheckCircle, FaTrash } from 'react-icons/fa';
 import logo from '../assets/logoo.png';
+
+const compressImage = (file, maxWidth = 1500, maxHeight = 1500, quality = 0.85) => {
+  return new Promise((resolve) => {
+    if (!file || !file.type.startsWith('image/')) {
+      resolve(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              resolve(file);
+              return;
+            }
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+    };
+    reader.onerror = () => resolve(file);
+  });
+};
 
 const CaptainSignup = () => {
   const navigate = useNavigate();
@@ -43,11 +99,12 @@ const CaptainSignup = () => {
     rc: null
   });
 
-  const handleFileChange = (e, type) => {
+  const handleFileChange = async (e, type) => {
     const file = e.target.files[0];
     if (file) {
-      setFiles(prev => ({ ...prev, [type]: file }));
       setPreviews(prev => ({ ...prev, [type]: URL.createObjectURL(file) }));
+      const compressedFile = await compressImage(file);
+      setFiles(prev => ({ ...prev, [type]: compressedFile }));
     }
   };
 
@@ -58,7 +115,7 @@ const CaptainSignup = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    
+
     // Check if all files are selected in step 2
     const missingDocs = Object.keys(files).filter(key => !files[key]);
     if (missingDocs.length > 0) {
@@ -68,7 +125,7 @@ const CaptainSignup = () => {
 
     setLoading(true);
     const formData = new FormData();
-    
+
     // Nesting for express-validator
     formData.append('fullname[firstname]', firstName);
     formData.append('fullname[lastname]', lastName);
@@ -108,7 +165,7 @@ const CaptainSignup = () => {
   return (
     <div className="min-h-screen bg-[#fbf8fd] flex flex-col items-center py-12 px-4 font-['Inter']">
       <ToastContainer position="top-center" autoClose={3000} />
-      
+
       <img className="h-10 mb-8 sm:h-12" src={logo} alt="Logo" />
 
       {/* Progress Stepper */}
@@ -188,8 +245,8 @@ const CaptainSignup = () => {
 
         <div className="mt-12 pt-8 border-t border-[#efedf2] text-center">
           <p className="text-sm text-gray-500">
-            By creating an account, you agree to our 
-            <span className="text-[#010102] font-bold mx-1">Privacy Policy</span> and 
+            By creating an account, you agree to our
+            <span className="text-[#010102] font-bold mx-1">Privacy Policy</span> and
             <span className="text-[#010102] font-bold mx-1">Operator Guidelines.</span>
           </p>
           <p className="mt-4 text-sm font-medium">Already registered? <Link to="/captain-login" className="text-[#7b5900] underline font-bold">Access Dashboard</Link></p>
