@@ -28,4 +28,10 @@ router.get('/fleet-stats', authMiddleware.authAdmin, adminController.getDetailed
 router.get('/captain/:id', authMiddleware.authAdmin, adminController.getCaptainDetails);
 
 
+router.get('/captain/:id/rides', authMiddleware.authAdmin, adminController.getCaptainAllRides);
+
+router.get('/captain/:id/settlements', authMiddleware.authAdmin, adminController.getCaptainSettlements);
+
+
+
 module.exports = router;

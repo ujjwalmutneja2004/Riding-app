@@ -189,6 +189,9 @@ app.use('/rides', rideRoutes)
 app.use('/admin', adminRoutes)
 app.use((err, req, res, next) => {
   console.error("🔥 GLOBAL ERROR:", err);
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ message: 'One or more uploaded files are too large. Max limit is 10MB per file.' });
+  }
   res.status(500).json({ message: err.message });
 });
 

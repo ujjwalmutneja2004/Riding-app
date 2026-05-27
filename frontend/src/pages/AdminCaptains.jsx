@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logoo.png';
+import { SocketContext } from '../context/SocketContext';
 
 const AdminCaptains = () => {
+    const { socket } = useContext(SocketContext);
     const [data, setData] = useState({
         aggregateOversight: 0,
         activeCaptainsCount: 0,
@@ -32,6 +34,35 @@ const AdminCaptains = () => {
     useEffect(() => {
         fetchFleetData();
     }, []);
+
+    // Join admin room and listen for real-time fleet updates
+    useEffect(() => {
+        if (!socket) return;
+        const adminId = localStorage.getItem('adminId') || 'admin';
+        socket.emit('join', { userId: adminId, userType: 'admin' });
+
+        socket.on('captain-status-updated', ({ captainId, isAvailable }) => {
+            setData(prev => {
+                if (!prev || !prev.fleet) return prev;
+                const updatedFleet = prev.fleet.map(captain => {
+                    if (captain.id === captainId) {
+                        return { ...captain, isAvailable };
+                    }
+                    return captain;
+                });
+                const activeCount = updatedFleet.filter(c => c.isAvailable).length;
+                return {
+                    ...prev,
+                    fleet: updatedFleet,
+                    activeCaptainsCount: activeCount
+                };
+            });
+        });
+
+        return () => {
+            socket.off('captain-status-updated');
+        };
+    }, [socket]);
 
     useEffect(() => {
         setCurrentPage(1); // Reset page when filter changes

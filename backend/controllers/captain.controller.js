@@ -163,6 +163,22 @@ module.exports.logoutCaptain = async (req, res, next) => {
             return res.status(400).json({ message: 'No token provided' });
         }
 
+
+        if (req.captain) {
+            await captainModel.findByIdAndUpdate(req.captain._id, {
+                $set: { isAvailable: false },
+                $unset: { socketId: "" }
+            });
+            console.log(`Captain ${req.captain._id} logged out and marked offline.`);
+
+            try {
+                const { broadcastAdmin } = require('../socket');
+                broadcastAdmin('captain-status-updated', { captainId: req.captain._id, isAvailable: false });
+            } catch (socketErr) {
+                console.error("Error broadcasting captain logout status:", socketErr);
+            }
+        }
+
         await blackListTokenModel.create({ token });
         console.log("Token blacklisted successfully");
 
@@ -296,7 +312,7 @@ module.exports.handleCashout = async (req, res, next) => {
 
         // Mask account number for secure history tracking
         const accNo = bankDetails.accountNumber || "";
-        const masked = accNo.length >= 4 
+        const masked = accNo.length >= 4
             ? "*".repeat(accNo.length - 4) + accNo.slice(-4)
             : accNo;
 
@@ -377,9 +393,11 @@ module.exports.toggleAvailableStatus = async (req, res, next) => {
         captain.isAvailable = !captain.isAvailable;
         await captain.save();
 
-        res.status(200).json({ 
+        const { broadcastAdmin } = require('../socket');
+        broadcastAdmin('captain-status-updated', { captainId: captain._id, isAvailable: captain.isAvailable });
+        res.status(200).json({
             message: `Status updated to ${captain.isAvailable ? 'Online' : 'Offline'}`,
-            isAvailable: captain.isAvailable 
+            isAvailable: captain.isAvailable
         });
     } catch (err) {
         console.error("Error toggling status:", err);
